@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
+	id="WebApp_ID" version="4.0">
+	
+	<display-name>taxi-service</display-name>
+
+	<!--============================================================ 
+	Controller
+	============================================================= -->
+	<servlet>
+		<servlet-name>Controller</servlet-name>
+		<servlet-class>com.example.taxiservice.web.Controller</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>Controller</servlet-name>
+		<url-pattern></url-pattern>
+	</servlet-mapping>
+
+	<!--============================================================ 
+	i18n support
+	============================================================= -->
+	<!-- this way we set the resource bundle name -->
+	<context-param>
+		<param-name>javax.servlet.jsp.jstl.fmt.localizationContext</param-name>
+		<param-value>i18n/resources</param-value>
+	</context-param>
+
+	<!-- this way we set the default locale (optional) -->
+	<!-- the (preferable) browser's locale will be used if we don't set the default locale -->
+	<context-param>
+		<param-name>javax.servlet.jsp.jstl.fmt.locale</param-name>
+		<param-value>en</param-value>
+	</context-param>
+
+	<!-- supported locales -->
+	<context-param>
+		<param-name>locales</param-name>
+		<param-value>en uk</param-value>
+	</context-param>
+
+	<!--============================================================
+	Encoding support filter
+	============================================================= -->
+	<filter>
+		<filter-name>EncodingFilter</filter-name>
+		<filter-class>com.example.taxiservice.web.filter.EncodingFilter</filter-class>
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>UTF-8</param-value>
+		</init-param>
+	</filter>
+
+	<filter-mapping>
+		<filter-name>EncodingFilter</filter-name>
+		<url-pattern>/WEB-INF/jsp/*</url-pattern>
+		<servlet-name>Controller</servlet-name>
+	</filter-mapping>
+
+	<!--============================================================ 
+	Locale change filter.
+	============================================================= -->
+	<filter>
+		<filter-name>LangFilter</filter-name>
+		<filter-class>com.example.taxiservice.web.filter.LangFilter</filter-class>
+	</filter>
+
+	<filter-mapping>
+		<filter-name>LangFilter</filter-name>
+		<url-pattern>/WEB-INF/jsp/*</url-pattern>
+		<servlet-name>Controller</servlet-name>
+	</filter-mapping>
+
+	<!--============================================================ 
+	Security filter. 
+	============================================================= -->
+	<filter>
+		<filter-name>AccessFilter</filter-name>
+		<filter-class>com.example.taxiservice.web.filter.AccessFilter</filter-class>
+		<init-param>
+			<param-name>user</param-name>
+			<param-value>sign_out profile_page profile_update_page profile_update profile_delete new_trip_page new_trip trips_page get_street_numbers</param-value>
+		</init-param>
+		<init-param>
+			<param-name>guest</param-name>
+			<param-value>sign_in_page sign_in sign_up_page sign_up</param-value>
+		</init-param>
+		<init-param>
+			<param-name>common</param-name>
+			<param-value>home_page no_command</param-value>
+		</init-param>
+	</filter>
+
+	<filter-mapping>
+		<filter-name>AccessFilter</filter-name>
+		<servlet-name>Controller</servlet-name>
+	</filter-mapping>
+
+	<!--============================================================ 
+	Context listener 
+	============================================================= -->
+	<listener>
+		<listener-class>com.example.taxiservice.web.listener.ContexListener</listener-class>
+	</listener>
+
+	<!--============================================================
+	Error page
+	============================================================= -->
+	<error-page>
+		<exception-type>java.lang.Throwable</exception-type>
+		<location>/WEB-INF/jsp/error.jsp</location>
+	</error-page>
+
+	<error-page>
+		<error-code>404</error-code>
+		<location>/WEB-INF/jsp/error.jsp</location>
+	</error-page>
+
+</web-app>
