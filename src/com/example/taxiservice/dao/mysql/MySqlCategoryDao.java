@@ -20,11 +20,16 @@ import com.example.taxiservice.model.Category;
 public class MySqlCategoryDao extends AbstractDao<Category> implements CategoryDao{
 	
 	private static final String SQL__FIND_CATEGORY_BY_ID = "SELECT * FROM car_category WHERE cc_id=?";
-	private static final String SQL__FIND_CATEGORY_BY_NAME = "SELECT * FROM car_category WHERE cc_name=?";
 	private static final String SQL__INSERT_CATEGORY = "INSERT INTO car_category (cc_name, cc_price) VALUES (?,?)";
 	private static final String SQL__UPDATE_CATEGORY = "UPDATE car_category SET cc_name=?, cc_price=? WHERE cc_id = ?";
 	private static final String SQL__DELETE_CATEGORY = "DELETE FROM car_category WHERE cc_id = ?";
 	private static final String SQL__SELECT_ALL_CATEGORY = "SELECT * FROM car_category";
+	private static final String SQL__FIND_CATEGORY_BY_ID_AND_LOCALE = "SELECT cc_id, cct_name AS cc_name, cc_price FROM car_category " +
+																	  "INNER JOIN car_category_translation ON cc_id = cct_car_category " +
+																	  "INNER JOIN language ON cct_lang = lang_id WHERE cc_id = ? AND lang_name = ?";
+	private static final String SQL__SELECT_ALL_CATEGORY_BY_LOCALE = "SELECT cc_id, cct_name AS cc_name, cc_price FROM car_category " +
+																	 "INNER JOIN car_category_translation ON cc_id = cct_car_category " +
+																	 "INNER JOIN language ON cct_lang = lang_id WHERE lang_name = ?";
 	
 	private static final Logger LOG = LoggerFactory.getLogger(MySqlCategoryDao.class);
 
@@ -64,7 +69,7 @@ public class MySqlCategoryDao extends AbstractDao<Category> implements CategoryD
 	}
 	
 	@Override
-	public Category find(String name) {
+	public Category find(Long id, String lang) {
 		Category category = null;
 		
 		Connection connection = null;
@@ -73,8 +78,9 @@ public class MySqlCategoryDao extends AbstractDao<Category> implements CategoryD
 		
 		try {
 			connection = getConnection();
-			statement = connection.prepareStatement(SQL__FIND_CATEGORY_BY_NAME);
-			statement.setString(1, name);
+			statement = connection.prepareStatement(SQL__FIND_CATEGORY_BY_ID_AND_LOCALE);
+			statement.setLong(1, id);
+			statement.setString(2, lang);
 			set = statement.executeQuery();
 			
 			while (set.next()) {
@@ -87,11 +93,11 @@ public class MySqlCategoryDao extends AbstractDao<Category> implements CategoryD
 			rollback(connection);
 			LOG.error(e.getMessage());
 		} finally {
+			
 			close(set, statement, connection);			
 		}
 				
 		return category;
-		
 	}
 
 	@Override
@@ -200,9 +206,41 @@ public class MySqlCategoryDao extends AbstractDao<Category> implements CategoryD
 		return result;
 		
 	}
+	
+	@Override
+	public List<Category> findAll(String lang) {
+		List<Category> result = new ArrayList<>();
+		Category category = null;
+		
+		Connection connection = null;
+		PreparedStatement statement = null;
+		ResultSet set = null;
+		
+		try {
+			connection = getConnection();
+			statement = connection.prepareStatement(SQL__SELECT_ALL_CATEGORY_BY_LOCALE);
+			statement.setString(1, lang);
+			set = statement.executeQuery();
+			
+			while (set.next()) {
+				category = mapRow(set);
+				result.add(category);
+			}
+			
+			commit(connection);
+			
+		} catch (SQLException e) {
+			rollback(connection);
+			LOG.error(e.getMessage());
+		} finally {
+			close(set, statement, connection);			
+		}	
+		
+		return result;
+	}
 
 	@Override
-	public Category mapRow(ResultSet set) {
+	protected Category mapRow(ResultSet set) {
 		Category category = null;
 		
 		try {

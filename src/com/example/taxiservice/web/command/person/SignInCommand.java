@@ -1,8 +1,6 @@
 package com.example.taxiservice.web.command.person;
 
 import java.io.IOException;
-import java.util.Map;
-import java.util.TreeMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -22,7 +20,6 @@ import com.example.taxiservice.web.command.Command;
 public class SignInCommand extends Command {
 
 	private static final long serialVersionUID = -4092142808306722870L;
-	
 	private static final Logger LOG = LoggerFactory.getLogger(SignInCommand.class);
 
 	@Override
@@ -44,22 +41,22 @@ public class SignInCommand extends Command {
 	private Page doPost(HttpServletRequest request, HttpServletResponse response) {
 		
 		Page result = null;
-		Map <String, String> errors = new TreeMap<>();
+		String errorMessage = null;
 		
 		String phone = request.getParameter("phone");
 		String password = request.getParameter("password");
 		
 		PersonService personService = new PersonService();
 		Person person = personService.find(phone);
-		LOG.debug("Found person:" + person);
+		password = personService.hashPassword(password);
 		
 		if(person == null) {
-			errors.put("phone", "error.label.anchor.wrong_phone");
-		}else if(errors.isEmpty() && !password.equals(person.getPassword())){
-			errors.put("password", "error.label.anchor.wrong_password");
+			errorMessage = "phone";
+		}else if(errorMessage == null && password != null && !password.equals(person.getPassword())){
+			errorMessage = "password";
 		}
 		
-		if(errors.isEmpty()) {
+		if(errorMessage == null) {
 			
 			HttpSession session = request.getSession(true);
 									
@@ -79,17 +76,10 @@ public class SignInCommand extends Command {
 			session.setAttribute("personRole", personRole.getName());
 			LOG.info("Person: " + person + " logged with role: " + personRole.getName());
 			
-			result = new Page(Path.COMMAND__PROFILE_PAGE, true);
+			result = new Page(Path.COMMAND__HOME_PAGE, true);
 			
-		}else {
-			
-			LOG.error("errorMessage: Can't find account with such phone or password");
-			
-			request.setAttribute("errorPhone", errors.get("phone"));
-			request.setAttribute("errorPassword", errors.get("password"));
-			request.setAttribute("phone", phone);	
-			
-			result = new Page(Path.PAGE__SIGN_IN);
+		}else {		
+			result = new Page(Path.COMMAND__SIGN_IN_PAGE + "&error=" + errorMessage, true);
 		}
 		
 		return result;

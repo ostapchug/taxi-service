@@ -1,8 +1,6 @@
 package com.example.taxiservice.web.command.person;
 
 import java.io.IOException;
-import java.util.Map;
-import java.util.TreeMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -20,7 +18,6 @@ import com.example.taxiservice.web.command.Command;
 public class SignUpCommand extends Command {
 
 	private static final long serialVersionUID = -3445237114266973954L;
-	
 	private static final Logger LOG = LoggerFactory.getLogger(SignUpCommand.class);
 
 	@Override
@@ -40,7 +37,7 @@ public class SignUpCommand extends Command {
 	
 	private Page doPost(HttpServletRequest request, HttpServletResponse response) {
 		Page result = null;
-		Map <String, String> errors = new TreeMap<>();
+		String errorMessage = null;
 		
 		String phone = request.getParameter("phone");
 		String password = request.getParameter("password");
@@ -51,28 +48,26 @@ public class SignUpCommand extends Command {
 		PersonService personService = new PersonService();
 		
 		if(!personService.validatePhone(phone)) {
-			errors.put("phone", "error.label.anchor.format");
+			errorMessage = "phone_format";
 		}else if(!personService.validatePassword(password)) {
-			errors.put("password", "error.label.anchor.format");
+			errorMessage = "password";
 		}else if(!personService.validatePassword(password, passwordConfirm)) {
-			errors.put("passwordConfirm", "error.label.anchor.wrong_password_confirm");
-		}
-		
-		if(!name.isEmpty() && !personService.validateText(name)) {
-			errors.put("name", "error.label.anchor.format");
-		}
-		
-		if(!surname.isEmpty() && !personService.validateText(surname)) {
-			errors.put("surname", "error.label.anchor.format");
+			errorMessage = "password_confirm";
+		}else if(!name.isEmpty() && !personService.validateText(name)) {
+			errorMessage = "name";
+		}else if(!surname.isEmpty() && !personService.validateText(surname)) {
+			errorMessage = "surname";
 		}
 		
 		Person personRecord = personService.find(phone);
 		
-		if(errors.isEmpty() && personRecord != null) {
-			errors.put("phone", "error.label.anchor.already_exist_phone");
+		if(errorMessage == null && personRecord != null) {
+			errorMessage ="phone_exist";
 		}
 		
-		if(errors.isEmpty()) {
+		if(errorMessage == null) {
+			personService.hashPassword(password);
+			personService.hashPassword(passwordConfirm);
 			Person person = new Person();
 			person.setPhone(phone);
 			person.setPassword(password);
@@ -81,23 +76,11 @@ public class SignUpCommand extends Command {
 			person.setRoleId(1);
 				
 			personService.insert(person);
-			LOG.debug("Person record created: " + person);
 						
 			result = new Page(Path.COMMAND__SIGN_IN_PAGE, true);	
-		}else {
+		}else {			
 			
-			LOG.error("errorMessage: Can't create account");
-			
-			request.setAttribute("errorPhone", errors.get("phone"));
-			request.setAttribute("errorPassword", errors.get("password"));
-			request.setAttribute("errorPasswordConfirm", errors.get("passwordConfirm"));
-			request.setAttribute("errorName", errors.get("name"));
-			request.setAttribute("errorSurname", errors.get("surname"));
-			request.setAttribute("phone", phone);
-			request.setAttribute("name", name);
-			request.setAttribute("surname", surname);
-			
-			result = new Page(Path.PAGE__SIGN_UP);
+			result = new Page(Path.COMMAND__SIGN_UP_PAGE + "&error=" + errorMessage, true);
 		}
 		
 		return result;

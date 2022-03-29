@@ -6,11 +6,17 @@ import java.util.List;
 import com.example.taxiservice.model.Location;
 
 public interface LocationDao extends EntityDao<Location> {
-	Location find(String name, String number);
 	
-	List<String> findAllNumbers(String streetName);
+	Location find(Long id, String lang);
 	
-	List<String> findNamesDistinct();
+	BigDecimal findDistance(Location origin, Location destination);
 	
-	BigDecimal findDistance(Long originId, Long destId);
+	/**
+	 * Finds all objects of type <code>Location</code> in DB
+	 *
+	 * @return all objects that DB has at this point
+	 */
+	List<Location> findAll();
+	
+	List<Location> findAll(String lang);
 }

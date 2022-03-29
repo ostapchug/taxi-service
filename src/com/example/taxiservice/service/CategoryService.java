@@ -1,6 +1,5 @@
 package com.example.taxiservice.service;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -22,13 +21,32 @@ public class CategoryService {
 		this.categoryDao = new MySqlCategoryDao(DBManager.getInstance());
 	}
 	
-	public BigDecimal getPrice(String name) {
-		Category category = categoryDao.find(name);
-		return category.getPrice();
+	public Category find(Long id) {
+		return categoryDao.find(id);
 	}
 	
-	public List<Category> findAll(){
-		return categoryDao.findAll();
+	public Category find(Long id, String lang) {
+		Category result = null;
+		
+		if(lang == null) {
+			result = categoryDao.find(id);
+		}else {
+			result = categoryDao.find(id, lang);
+		}
+		
+		return result;
+	}
+	
+	public List<Category> findAll(String lang){
+		List<Category> result = null;
+		
+		if(lang == null) {
+			result = categoryDao.findAll();
+		}else {
+			result = categoryDao.findAll(lang);
+		}
+		
+		return result;
 	}
 
 }

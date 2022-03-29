@@ -1,0 +1,55 @@
+<script>
+$(function(){
+		var msg = {
+			applyLabel: "<fmt:message key='datepicker_jspf.anchor.apply'/>",
+			cancelLabel: "<fmt:message key='datepicker_jspf.anchor.clear'/>",
+			daysOfWeek: [
+				"<fmt:message key='datepicker_jspf.anchor.daysOfWeek.su'/>",
+				"<fmt:message key='datepicker_jspf.anchor.daysOfWeek.mo'/>",
+				"<fmt:message key='datepicker_jspf.anchor.daysOfWeek.tu'/>",
+				"<fmt:message key='datepicker_jspf.anchor.daysOfWeek.we'/>",
+				"<fmt:message key='datepicker_jspf.anchor.daysOfWeek.th'/>",
+				"<fmt:message key='datepicker_jspf.anchor.daysOfWeek.fr'/>",
+				"<fmt:message key='datepicker_jspf.anchor.daysOfWeek.sa'/>"
+				],
+			monthNames: [
+				"<fmt:message key='datepicker_jspf.anchor.monthNames.jan'/>",
+				"<fmt:message key='datepicker_jspf.anchor.monthNames.feb'/>",
+				"<fmt:message key='datepicker_jspf.anchor.monthNames.mar'/>",
+				"<fmt:message key='datepicker_jspf.anchor.monthNames.apr'/>",
+				"<fmt:message key='datepicker_jspf.anchor.monthNames.may'/>",
+				"<fmt:message key='datepicker_jspf.anchor.monthNames.jun'/>",
+				"<fmt:message key='datepicker_jspf.anchor.monthNames.jul'/>",
+				"<fmt:message key='datepicker_jspf.anchor.monthNames.aug'/>",
+				"<fmt:message key='datepicker_jspf.anchor.monthNames.sep'/>",
+				"<fmt:message key='datepicker_jspf.anchor.monthNames.oct'/>",
+				"<fmt:message key='datepicker_jspf.anchor.monthNames.nov'/>",
+				"<fmt:message key='datepicker_jspf.anchor.monthNames.dec'/>"
+			]	
+		  };
+		
+		var dateFilter = $('input[name="dateFilter"]');
+  		
+		dateFilter.daterangepicker({
+ 			 autoUpdateInput: false,
+ 			 locale: {
+ 				format: "DD.MM.YYYY",
+		        separator: " - ",
+		        applyLabel: msg.applyLabel,
+		        cancelLabel: msg.cancelLabel,
+		        daysOfWeek: msg.daysOfWeek,
+		        monthNames: msg.monthNames,
+		        firstDay: 1
+ 			 }
+ 		});
+ 		 
+		dateFilter.on('apply.daterangepicker', function(ev, picker) {
+			$(this).val(picker.startDate.format('DD.MM.YYYY') + ' - ' + picker.endDate.format('DD.MM.YYYY'));
+ 		});
+
+		dateFilter.on('cancel.daterangepicker', function(ev, picker) {
+			$(this).val('');
+ 		});
+ 		 
+ });
+</script>

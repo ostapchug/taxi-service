@@ -1,8 +1,10 @@
 package com.example.taxiservice.web.filter;
 
 import java.io.IOException;
+
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -25,10 +27,12 @@ public class LangFilter implements Filter {
 		LOG.debug("Filter starts");
 		
 		HttpServletRequest httpRequest = (HttpServletRequest) request;
+		ServletContext servletContext = httpRequest.getServletContext();
 		
 		String locale = request.getParameter("locale");
+		String locales = servletContext.getInitParameter("locales");
 		
-		if(locale != null) {
+		if(locale != null && locales.contains(locale)) {
 			HttpSession session = httpRequest.getSession();
 			Config.set(session, Config.FMT_LOCALE, locale);
 			session.setAttribute("locale", locale);

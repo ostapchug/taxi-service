@@ -81,7 +81,11 @@
 		<filter-class>com.example.taxiservice.web.filter.AccessFilter</filter-class>
 		<init-param>
 			<param-name>user</param-name>
-			<param-value>sign_out profile_page profile_update_page profile_update profile_delete new_trip_page new_trip trips_page get_street_numbers</param-value>
+			<param-value>
+			sign_out profile_page profile_update_page profile_update profile_delete new_trip_page 
+			new_trip trip_offer_page trip_offer trips_page trip_confirm_page trip_confirm filter_trips 
+			trip_status
+			</param-value>
 		</init-param>
 		<init-param>
 			<param-name>guest</param-name>
@@ -89,7 +93,7 @@
 		</init-param>
 		<init-param>
 			<param-name>common</param-name>
-			<param-value>home_page no_command</param-value>
+			<param-value>home_page no_command error_page</param-value>
 		</init-param>
 	</filter>
 

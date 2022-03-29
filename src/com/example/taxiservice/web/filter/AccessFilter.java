@@ -13,6 +13,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
@@ -48,22 +49,24 @@ public class AccessFilter implements Filter {
 			LOG.debug("Filter finished");
 			chain.doFilter(request, response);
 		} else {
-			String errorMessasge = "error_jsp.anchor.access_denied";
-			
-			request.setAttribute("errorMessage", errorMessasge);
+			String errorMessasge = "access_denied";
 			LOG.debug("Set the request attribute: errorMessage --> " + errorMessasge);
-			request.setAttribute("errorMessasge", errorMessasge);
-			request.getRequestDispatcher(Path.PAGE__ERROR).forward(request, response);
+			HttpServletResponse httpResponse = (HttpServletResponse) response;
+			httpResponse.sendRedirect(Path.COMMAND__ERROR_PAGE + "&error=" + errorMessasge);
 		}
 	}
 	
 	private boolean accessAllowed(ServletRequest request) {
 		boolean result = false;
+		Object personID = null;
 		
 		HttpServletRequest httpRequest = (HttpServletRequest) request;
 		HttpSession session = httpRequest.getSession(false);
-		Object personID = session.getAttribute("personId");
-
+		
+		if(session != null) {
+			personID = session.getAttribute("personId");			
+		}
+		
 		String commandName = request.getParameter("command");
 		LOG.debug(commandName);
 		

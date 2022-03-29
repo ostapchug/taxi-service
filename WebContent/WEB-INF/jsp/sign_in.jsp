@@ -7,12 +7,14 @@
 <%@ include file="/WEB-INF/jspf/head.jspf"%>
 <body>
 	<%@ include file="/WEB-INF/jspf/navbar.jspf"%>
-	<div class="container">
-		<div class="page-header">
-			<h2>
-				<fmt:message key="general.anchor.sign_in" />
-			</h2>
+	
+	<div class="page-header">
+		<div class="container">
+			<h2><fmt:message key="general.anchor.sign_in" /></h2>
 		</div>
+	</div>
+	
+	<div class="container">
 		<div class="row">
 			<div class="col-sm-offset-3 col-md-6 inf-content">
 				<h3>
@@ -59,7 +61,7 @@
 							</button>
 							&nbsp;
 							<fmt:message key="sign_in_jsp.anchor.hint"/>
-							<a href="app?command=sign_up_page"><fmt:message	key="general.anchor.sign_up"/></a>
+							<a href="?command=sign_up_page"><fmt:message key="general.anchor.sign_up"/></a>
 						</div>
 					</div>
 				</form>

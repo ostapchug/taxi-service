@@ -5,7 +5,6 @@ import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,16 +24,35 @@ public class ProfileUpdatePageCommand extends Command {
 	public Page execute(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 		
 		LOG.debug("Command start");
-		HttpSession session = request.getSession(false);
-		String phone = session.getAttribute("personPhone") != null ? String.valueOf(session.getAttribute("personPhone")) : "";
-		String name = session.getAttribute("personName") != null ?  String.valueOf(session.getAttribute("personName")) : "";
-		String surname = session.getAttribute("personSurname") != null ? String.valueOf(session.getAttribute("personSurname")) : "";
+		String errorMessage = request.getParameter("error");
 		
-		request.setAttribute("phone", phone);
-		request.setAttribute("name", name);
-		request.setAttribute("surname", surname);
+		if(errorMessage != null) {
+			switch (errorMessage) {
+				case "phone_format":
+					request.setAttribute("errorPhone", "error.label.anchor.format");
+					break;
+				case "phone_exist":
+					request.setAttribute("errorPhone", "error.label.anchor.already_exist_phone");
+					break;
+				case "password":
+					request.setAttribute("errorPassword", "error.label.anchor.format");
+					break;
+				case "password_confirm":
+					request.setAttribute("errorPasswordConfirm", "error.label.anchor.wrong_password_confirm");
+					break;
+				case "name":
+					request.setAttribute("errorName", "error.label.anchor.format");
+					break;
+				case "surname":
+					request.setAttribute("errorSurname", "error.label.anchor.format");
+					break;
+	
+				default:
+					break;
+				}
+		}
+		
 		LOG.debug("Command finish");
-		
 		return new Page(Path.PAGE__PROFILE_UPDATE);
 	}
 	

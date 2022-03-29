@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @param <T> - entity type
  */
-public abstract class AbstractDao<T> implements EntityDao<T> {
+public abstract class AbstractDao<T> {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(AbstractDao.class);
 	
@@ -123,5 +123,15 @@ public abstract class AbstractDao<T> implements EntityDao<T> {
 		close(statement);
 		close(connection);
 	}
+	
+	/**
+     * Extracts an entity from the ResultSet row
+     * Implementations are not supposed to move cursor of the resultSet via next() method
+	 *
+	 * @param set - database ResultSet
+	 * @return object type <code>T</code>, entity that were extracted
+	 * 
+	 */		
+	protected abstract T mapRow(ResultSet set);
 
 }

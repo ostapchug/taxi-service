@@ -20,6 +20,24 @@ public class Fields {
 	public static final String LOCATION__ID = "l_id";
 	public static final String LOCATION__STREET_NAME = "l_street_name";
 	public static final String LOCATION__STREET_NUMBER = "l_street_number";
+	public static final String LOCATION__COORDINATES = "l_coordinates";
+	
+	public static final String CAR__ID = "c_id";
+	public static final String CAR__REG_NUMBER = "c_reg_number";
+	public static final String CAR__MODEL = "c_model";
+	public static final String CAR__CATEGORY = "c_category";
+	public static final String CAR__LOCATION = "c_location";
+	public static final String CAR__STATUS = "c_status";
+	
+	public static final String TRIP__ID = "t_id";
+	public static final String TRIP__PERSON_ID = "t_person";
+	public static final String TRIP__ORIGIN_ID = "t_origin";
+	public static final String TRIP__DESTINATION_ID = "t_destination";
+	public static final String TRIP__DISTANCE = "t_distance";
+	public static final String TRIP__DATE = "t_date";
+	public static final String TRIP__BILL = "t_bill";
+	public static final String TRIP__STATUS_ID = "t_status";
+	
 
 
 }

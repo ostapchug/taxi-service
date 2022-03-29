@@ -23,10 +23,10 @@
         	</c:choose>
         <span class="caret"></span></a>
         <ul class="dropdown-menu">       
-        <li class ="${home}"><a href="?command=home_page"><fmt:message key="general.anchor.home"/></a></li>
-        <li class ="${profile}"><a href="?command=profile_page"><fmt:message key="general.anchor.profile"/></a></li>
-        <li class ="${trip}"><a href="?command=new_trip_page"><fmt:message key="trip_jsp.anchor.info"/></a></li>
-        <li class ="${trips}"><a href="?command=trips_page"><fmt:message key="general.anchor.trips"/></a></li>
+        <li class ="<c:out value = "${home}"/>"><a href="?command=home_page"><fmt:message key="general.anchor.home"/></a></li>
+        <li class ="<c:out value = "${profile}"/>"><a href="?command=profile_page"><fmt:message key="general.anchor.profile"/></a></li>
+        <li class ="<c:out value = "${trip}"/>"><a href="?command=new_trip_page"><fmt:message key="trip_jsp.anchor.info"/></a></li>
+        <li class ="<c:out value = "${trips}"/>"><a href="?command=trips_page"><fmt:message key="general.anchor.trips"/></a></li>
         <li role="separator" class="divider"></li>
         <li><a href="?command=sign_out"><fmt:message key="navbar_jspf.anchor.sign_out"/></a></li>
         </ul>
@@ -44,12 +44,11 @@
             <c:set var = "lang" value="${empty locale ? defaultLocale : locale}"/>        	
         	
         	<c:forEach var="localeName" items="${locales}">
-				<li class="${lang == localeName ? 'active': ''}"><a href="${localePath += localeName}"><fmt:message key="navbar_jspf.anchor.lang_${localeName}"/></a></li>							
+				<li class="${lang == localeName ? 'active': ''}"><a href="<c:out value ="${localePath += localeName}"/>"><fmt:message key="navbar_jspf.anchor.lang_${localeName}"/></a></li>							
 			</c:forEach>
         </ul>  
     </li>
   	</ul>
   </div>
 </nav>
-<c:out value = "${path}"/>
 

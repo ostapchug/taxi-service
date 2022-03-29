@@ -23,7 +23,22 @@ public class SignInPageCommand extends Command {
 	public Page execute(HttpServletRequest request, HttpServletResponse response)	throws IOException, ServletException {
 		
 		LOG.debug("Command start");
-		// do nothing
+		String errorMessage = request.getParameter("error");
+		
+		if(errorMessage != null) {
+			switch (errorMessage) {
+				case "phone":
+					request.setAttribute("errorPhone", "error.label.anchor.wrong_phone");
+					break;
+				case "password":
+					request.setAttribute("errorPassword", "error.label.anchor.wrong_password");
+					break;
+	
+				default:
+					break;
+				}
+		}
+		
 		LOG.debug("Command finish");
 		return new Page(Path.PAGE__SIGN_IN);
 	}

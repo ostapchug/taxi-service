@@ -22,10 +22,14 @@ import com.example.taxiservice.model.Location;
 public class MySqlLocationDao extends AbstractDao<Location> implements LocationDao {
 	
 	private static final String SQL__FIND_LOCATION_BY_ID = "SELECT * FROM location WHERE l_id=?";
-	private static final String SQL__FIND_LOCATION_BY_NAME = "SELECT * FROM location WHERE l_street_name=? AND l_street_number=?";
-	private static final String SQL__SELECT_NAMES_DISTINCT = "SELECT DISTINCT l_street_name FROM location";
-	private static final String SQL__SELECT_NUMBERS_BY_NAME = "SELECT l_street_number FROM location WHERE l_street_name=?";
-	private static final String SQL__CALL_DISTANCE_SPHERE = "{?= CALL ST_Distance_Sphere ((SELECT l_coordinates FROM location WHERE l_id=?), (SELECT l_coordinates FROM location WHERE l_id=?))}";
+	private static final String SQL__SELECT_ALL_LOCATION = "SELECT * FROM location ORDER BY l_street_name, l_street_number";
+	private static final String SQL__CALL_DISTANCE_SPHERE = "{?= CALL ST_Distance_Sphere (?,?)}";
+	private static final String SQL__FIND_LOCATION_BY_ID_AND_LOCALE = "SELECT l_id, lt_street_name AS l_street_name, lt_street_number AS l_street_number, l_coordinates " +
+			 														  "FROM location INNER JOIN location_translation ON l_id = lt_location INNER JOIN language ON lt_lang = lang_id " +
+			 														  "WHERE l_id = ? AND lang_name = ?";
+	private static final String SQL__SELECT_ALL_LOCATION_BY_LOCALE = "SELECT l_id, lt_street_name AS l_street_name, lt_street_number AS l_street_number, l_coordinates " +
+																	 "FROM location INNER JOIN location_translation ON l_id = lt_location INNER JOIN language ON lt_lang = lang_id " +
+																	 "WHERE lang_name = ? ORDER BY l_street_name, l_street_number";
 	
 	private static final Logger LOG = LoggerFactory.getLogger(MySqlLocationDao.class);
 	
@@ -65,7 +69,7 @@ public class MySqlLocationDao extends AbstractDao<Location> implements LocationD
 	}
 	
 	@Override
-	public Location find(String name, String number) {
+	public Location find(Long id, String lang) {
 		Location result = null;
 		
 		Connection connection = null;
@@ -74,9 +78,9 @@ public class MySqlLocationDao extends AbstractDao<Location> implements LocationD
 		
 		try {
 			connection = getConnection();
-			statement = connection.prepareStatement(SQL__FIND_LOCATION_BY_NAME);
-			statement.setString(1, name);
-			statement.setString(2, number);
+			statement = connection.prepareStatement(SQL__FIND_LOCATION_BY_ID_AND_LOCALE);
+			statement.setLong(1, id);
+			statement.setString(2, lang);
 			set = statement.executeQuery();
 			
 			while (set.next()) {
@@ -93,7 +97,7 @@ public class MySqlLocationDao extends AbstractDao<Location> implements LocationD
 		}
 				
 		return result;
-
+		
 	}
 
 	@Override
@@ -110,34 +114,11 @@ public class MySqlLocationDao extends AbstractDao<Location> implements LocationD
 	public void delete(Location entity) {
 				
 	}
-
-
-	@Override
-	public Location mapRow(ResultSet set) {
-		Location location = null;
-		
-		try {
-			location = new Location();
-			
-			location.setId(set.getLong(Fields.LOCATION__ID));
-			location.setStreetName(set.getString(Fields.LOCATION__STREET_NAME));
-			location.setStreetNumber(set.getString(Fields.LOCATION__STREET_NUMBER));
-			
-		}catch (SQLException e) {
-        	LOG.error(e.getMessage());
-        }
-		
-		return location;
-	}
-
+	
 	@Override
 	public List<Location> findAll() {
-		return null;
-	}
-
-	@Override
-	public List<String> findNamesDistinct() {
-		List<String> result = new ArrayList<>();
+		List<Location> result = new ArrayList<>();
+		Location location = null;
 		
 		Connection connection = null;
 		PreparedStatement statement = null;
@@ -145,11 +126,12 @@ public class MySqlLocationDao extends AbstractDao<Location> implements LocationD
 		
 		try {
 			connection = getConnection();
-			statement = connection.prepareStatement(SQL__SELECT_NAMES_DISTINCT);
+			statement = connection.prepareStatement(SQL__SELECT_ALL_LOCATION);
 			set = statement.executeQuery();
 			
 			while (set.next()) {
-				result.add(set.getString(1));						
+				location = mapRow(set);
+				result.add(location);
 			}
 			
 			commit(connection);
@@ -160,13 +142,14 @@ public class MySqlLocationDao extends AbstractDao<Location> implements LocationD
 		} finally {
 			close(set, statement, connection);			
 		}
-				
+		
 		return result;
 	}
-
+	
 	@Override
-	public List<String> findAllNumbers(String streetName) {
-		List<String> result = new ArrayList<>();
+	public List<Location> findAll(String lang) {
+		List<Location> result = new ArrayList<>();
+		Location location = null;
 		
 		Connection connection = null;
 		PreparedStatement statement = null;
@@ -174,12 +157,13 @@ public class MySqlLocationDao extends AbstractDao<Location> implements LocationD
 		
 		try {
 			connection = getConnection();
-			statement = connection.prepareStatement(SQL__SELECT_NUMBERS_BY_NAME);
-			statement.setString(1, streetName);
+			statement = connection.prepareStatement(SQL__SELECT_ALL_LOCATION_BY_LOCALE);
+			statement.setString(1, lang);
 			set = statement.executeQuery();
 			
 			while (set.next()) {
-				result.add(set.getString(1));						
+				location = mapRow(set);
+				result.add(location);
 			}
 			
 			commit(connection);
@@ -190,13 +174,13 @@ public class MySqlLocationDao extends AbstractDao<Location> implements LocationD
 		} finally {
 			close(set, statement, connection);			
 		}
-				
+		
 		return result;
 	}
 
 
 	@Override
-	public BigDecimal findDistance(Long originId, Long destId) {
+	public BigDecimal findDistance(Location origin, Location destination) {
 		BigDecimal result = null;
 		
 		Connection connection = null;
@@ -205,8 +189,8 @@ public class MySqlLocationDao extends AbstractDao<Location> implements LocationD
 		try {
 			connection = getConnection();
 			statement = connection.prepareCall(SQL__CALL_DISTANCE_SPHERE);
-			statement.setLong(2, originId);
-			statement.setLong(3, destId);
+			statement.setBlob(2, origin.getCoordinates());
+			statement.setBlob(3, destination.getCoordinates());
 			statement.registerOutParameter(1, Types.DECIMAL);
 			statement.execute();
 			
@@ -222,6 +206,26 @@ public class MySqlLocationDao extends AbstractDao<Location> implements LocationD
 		}		
 		
 		return result;
+	}
+
+
+	@Override
+	protected Location mapRow(ResultSet set) {
+		Location location = null;
+		
+		try {
+			location = new Location();
+			
+			location.setId(set.getLong(Fields.LOCATION__ID));
+			location.setStreetName(set.getString(Fields.LOCATION__STREET_NAME));
+			location.setStreetNumber(set.getString(Fields.LOCATION__STREET_NUMBER));
+			location.setCoordinates(set.getBlob(Fields.LOCATION__COORDINATES));
+			
+		}catch (SQLException e) {
+        	LOG.error(e.getMessage());
+        }
+		
+		return location;
 	}
 	
 }

@@ -12,4 +12,5 @@ public interface PersonDao extends EntityDao<Person> {
 	 * @return Person instance with given phone
 	 */
 	Person find(String phone);
+	
 }

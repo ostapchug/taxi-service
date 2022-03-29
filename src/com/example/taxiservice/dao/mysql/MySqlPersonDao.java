@@ -5,7 +5,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -148,7 +147,6 @@ public class MySqlPersonDao extends AbstractDao<Person> implements PersonDao {
 			close(statement, connection);	
 		}	
 		
-		
 	}
 
 	@Override
@@ -172,15 +170,9 @@ public class MySqlPersonDao extends AbstractDao<Person> implements PersonDao {
 		}	
 		
 	}
-	
-	@Override
-	public List<Person> findAll() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	@Override
-	public Person mapRow(ResultSet set) {
+	protected Person mapRow(ResultSet set) {
 		Person person = null;
 		
 		try {

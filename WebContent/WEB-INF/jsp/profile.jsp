@@ -8,14 +8,17 @@
 <%@ include file="/WEB-INF/jspf/head.jspf"%>
 <body>
 <%@ include file="/WEB-INF/jspf/navbar.jspf"%>
-<div class="container">
+
 <div class="page-header">
-   <h2><fmt:message key="general.anchor.profile"/></h2>
+	<div class="container">
+   		<h2><fmt:message key="general.anchor.profile"/></h2>
+   	</div>
 </div>
 
+<div class="container">
 <div class="row">
 
-<div class="col-sm-offset-1 col-md-10 inf-content">
+<div class="col-sm-offset-2 col-md-8 inf-content">
 <h3><fmt:message key="profile_jsp.anchor.info"/></h3>
 <hr>
 
@@ -57,19 +60,9 @@
         </td>
         <td><c:out value="${personSurname}"/></td>
       </tr>
-      <tr>
-        <td>
-        <strong>
-        <span class="glyphicon glyphicon-eye-open text-primary"></span>
-        <fmt:message key="general.label.anchor.role"/>
-        </strong>
-        </td>
-        <td><c:out value="${personRole}"/></td>
-      </tr>
     </tbody>
   </table>
-  <a href="?command=profile_update_page" class="btn btn-success" role="button"><fmt:message key="general.button.anchor.edit"/></a>&nbsp;
-  <a href="?command=profile_delete" class="btn btn-danger" role="button"><fmt:message key="general.button.anchor.delete"/></a>
+  <a href="?command=profile_update_page" class="btn btn-success" role="button"><fmt:message key="general.button.anchor.edit"/></a>
   </div>
 </div>
 </div>

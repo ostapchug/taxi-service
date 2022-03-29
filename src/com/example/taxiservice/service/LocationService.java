@@ -1,7 +1,6 @@
 package com.example.taxiservice.service;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -21,22 +20,34 @@ public class LocationService {
 		this.locationDao = new MySqlLocationDao(DBManager.getInstance());
 	}
 	
-	public List<String> findAllNumbers(String streetName) {
-		return locationDao.findAllNumbers(streetName);
+	public Location find(Long id) {
+		return locationDao.find(id);
 	}
 	
-	public List<String> findNamesDistinct(){
-		return locationDao.findNamesDistinct();
+	public Location find(Long id, String lang) {
+		Location result = locationDao.find(id);
+		
+		if(lang != null) {
+			result = locationDao.find(id, lang);
+		}
+		
+		return result;
 	}
 	
-	public BigDecimal findDistance(String originName, String originNumber, String destName, String destNumber) {
-		Location origin = locationDao.find(originName, originNumber); 
-		Location destination = locationDao.find(destName, destNumber); 
-		Long originId = origin.getId();
-		Long destId = destination.getId();
-		return locationDao.findDistance(originId, destId).divide(new BigDecimal(1000.00), 2, RoundingMode.HALF_UP);
+	public List<Location> findAll(String lang){
+		List<Location> result = locationDao.findAll();
+		
+		if(lang != null) {
+			result = locationDao.findAll(lang);
+		}
+		
+		return result;
 	}
 	
-	
+	public BigDecimal findDistance(Long originId, Long destinationId) {
+		Location origin = find(originId);
+		Location destination = find(destinationId);
+		return locationDao.findDistance(origin, destination).divide(new BigDecimal(1000.00));
+	}
 
 }

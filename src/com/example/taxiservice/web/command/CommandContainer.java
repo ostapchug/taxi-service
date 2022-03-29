@@ -15,6 +15,15 @@ import com.example.taxiservice.web.command.person.SignInPageCommand;
 import com.example.taxiservice.web.command.person.SignOutCommand;
 import com.example.taxiservice.web.command.person.SignUpCommand;
 import com.example.taxiservice.web.command.person.SignUpPageCommand;
+import com.example.taxiservice.web.command.trip.FilterTripsCommand;
+import com.example.taxiservice.web.command.trip.NewTripCommand;
+import com.example.taxiservice.web.command.trip.NewTripPageCommand;
+import com.example.taxiservice.web.command.trip.TripConfirmCommand;
+import com.example.taxiservice.web.command.trip.TripConfirmPageCommand;
+import com.example.taxiservice.web.command.trip.TripOfferCommand;
+import com.example.taxiservice.web.command.trip.TripOfferPageCommand;
+import com.example.taxiservice.web.command.trip.TripStatusCommand;
+import com.example.taxiservice.web.command.trip.TripsPageCommand;
 
 
 /**
@@ -30,6 +39,7 @@ public class CommandContainer {
 	static {
 		// common commands
 		commands.put("home_page", new HomePageCommand());
+		commands.put("error_page", new ErrorPageCommand());
 		commands.put("sign_in_page", new SignInPageCommand());
 		commands.put("sign_up_page", new SignUpPageCommand());
 		commands.put("sign_in", new SignInCommand());
@@ -45,7 +55,12 @@ public class CommandContainer {
 		commands.put("new_trip_page", new NewTripPageCommand());
 		commands.put("new_trip", new NewTripCommand());
 		commands.put("trips_page", new TripsPageCommand());
-		commands.put("get_street_numbers", new GetStreetNumbersCommand());
+		commands.put("trip_confirm_page", new TripConfirmPageCommand());
+		commands.put("trip_offer_page", new TripOfferPageCommand());
+		commands.put("trip_offer", new TripOfferCommand());
+		commands.put("trip_confirm", new TripConfirmCommand());
+		commands.put("filter_trips", new FilterTripsCommand());
+		commands.put("trip_status", new TripStatusCommand());
 		
 		// admin commands
 		commands.put("", null);

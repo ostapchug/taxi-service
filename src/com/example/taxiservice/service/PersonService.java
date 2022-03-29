@@ -1,5 +1,7 @@
 package com.example.taxiservice.service;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -14,9 +16,8 @@ import com.example.taxiservice.model.Person;
 public class PersonService {
 	
 	private static final String PHONE_PATTERN = "[0-9]{10}";
-	private static final String TEXT_PATTERN = "[A-Z][A-Za-z]+|[А-Я][А-Яа-я]+";
-//	private static final String PASSWORD_PATTERN = "";
-	
+	private static final String TEXT_PATTERN = "[A-Z][a-z]+|[А-Я][а-я]+";
+	private static final String PASSWORD_PATTERN = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$";
 	private static final Logger LOG = LoggerFactory.getLogger(PersonService.class);
 	
 	private PersonDao personDao;
@@ -83,9 +84,14 @@ public class PersonService {
 	
 	public boolean validatePassword(String password) {
 		boolean result = false;
-		
+
 		if(password != null) {
-			result = true;
+			Pattern pattern = Pattern.compile(PASSWORD_PATTERN);
+			Matcher matcher = pattern.matcher(password);
+			
+			if(matcher.matches()) {
+				result = true;
+			}
 
 		}
 		
@@ -94,7 +100,7 @@ public class PersonService {
 	
 	public boolean validatePassword(String password, String passwordConfirm) {
 		boolean result = false;
-		LOG.debug(password + passwordConfirm);
+
 		if(password.equals(passwordConfirm)) {
 			result = true;
 		}
@@ -104,7 +110,24 @@ public class PersonService {
 	
 	public String hashPassword(String password) {
 		String result = null;
-		result = password; 		
+		
+		if(password != null) {
+			try {
+				MessageDigest md = MessageDigest.getInstance("SHA-256");
+	            byte[] bytes = md.digest(password.getBytes());
+	            StringBuilder sb = new StringBuilder();
+	            
+	            for (int i = 0; i < bytes.length; i++) {
+	                sb.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
+	            }
+	            
+	            result = sb.toString();
+	            
+	        } catch (NoSuchAlgorithmException e) {
+	            LOG.error(e.getMessage());
+	        }
+		}
+		
 		return result;	
 	}	
 

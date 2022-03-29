@@ -7,21 +7,25 @@
 <%@ include file="/WEB-INF/jspf/head.jspf"%>
 <body>
 <%@ include file="/WEB-INF/jspf/navbar.jspf"%>
-<div class="container">
+
 <div class="page-header">
-   <h2><fmt:message key="profile_update_jsp.anchor.header"/></h2>
+	<div class="container">
+		<h2><fmt:message key="profile_update_jsp.anchor.header"/></h2>
+	</div>
 </div>
+
+<div class="container">
 <div class="row">
 <div class="col-sm-offset-3 col-md-6 inf-content">
 <h3><fmt:message key="profile_update_jsp.anchor.info"/></h3>
 <hr>
-<form class="form-horizontal" action="app?command=profile_update" method="post">
+<form class="form-horizontal" action="?command=profile_update" method="post">
 
 <!-- Phone input-->
 <div class="form-group">
   <label class="control-label col-sm-3" for="phone"><fmt:message key="general.label.anchor.phone"/></label>  
   <div class="col-sm-8">
-  <input type="text" name="phone" placeholder="<fmt:message key="general.label.anchor.phone_placeholder"/>" value="<c:out value="${phone}"/>" class="form-control" required>
+  <input type="text" name="phone" placeholder="<fmt:message key="general.label.anchor.phone_placeholder"/>" value="<c:out value="${personPhone}"/>" class="form-control" required>
   <span class="help-block">
   <c:if test = "${not empty errorPhone}">
   	<fmt:message key="${errorPhone}"/>
@@ -60,7 +64,7 @@
 <div class="form-group">
   <label class="control-label col-sm-3" for="name"><fmt:message key="general.label.anchor.name"/></label>  
   <div class="col-sm-8">
-  <input type="text" name="name" placeholder="<fmt:message key="general.label.anchor.name_placeholder"/>" value="<c:out value="${name}"/>" class="form-control">
+  <input type="text" name="name" placeholder="<fmt:message key="general.label.anchor.name_placeholder"/>" value="<c:out value="${personName}"/>" class="form-control">
   <span class="help-block"> 
   <c:if test = "${not empty errorName}">
   	<fmt:message key="${errorName}"/>
@@ -73,7 +77,7 @@
 <div class="form-group">
   <label class="control-label col-sm-3" for="surname"><fmt:message key="general.label.anchor.surname"/></label>  
   <div class="col-sm-8">
-  <input type="text" name="surname" placeholder="<fmt:message key="general.label.anchor.surname_placeholder"/>" value="<c:out value="${surname}"/>" class="form-control">
+  <input type="text" name="surname" placeholder="<fmt:message key="general.label.anchor.surname_placeholder"/>" value="<c:out value="${personSurname}"/>" class="form-control">
   <span class="help-block">
   <c:if test = "${not empty errorSurname}">
   	<fmt:message key="${errorSurname}"/>
@@ -85,7 +89,8 @@
 <!-- Submit Button -->
 <div class="form-group">
   <div class="col-sm-offset-3 col-sm-8">
-    <button type="submit" class="btn btn-primary"><fmt:message key="general.button.anchor.submit"/></button>
+    <button type="submit" class="btn btn-primary"><fmt:message key="general.button.anchor.submit"/></button>&nbsp;
+    <a href="?command=profile_page" class="btn btn-danger" role="button"><fmt:message key="general.button.anchor.cancel"/></a>
   </div>
 </div>
 
