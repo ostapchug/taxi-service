@@ -6,9 +6,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.example.taxiservice.dao.DBManager;
 import com.example.taxiservice.dao.LocationDao;
-import com.example.taxiservice.dao.mysql.MySqlLocationDao;
 import com.example.taxiservice.model.Location;
 
 public class LocationService {
@@ -16,8 +14,8 @@ public class LocationService {
 	
 	private LocationDao locationDao;
 
-	public LocationService() {
-		this.locationDao = new MySqlLocationDao(DBManager.getInstance());
+	public LocationService(LocationDao locationDao) {
+		this.locationDao = locationDao;
 	}
 	
 	public Location find(Long id) {

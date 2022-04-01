@@ -10,6 +10,8 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.example.taxiservice.dao.DBManager;
+import com.example.taxiservice.dao.mysql.MySqlPersonDao;
 import com.example.taxiservice.model.Person;
 import com.example.taxiservice.model.Role;
 import com.example.taxiservice.service.PersonService;
@@ -46,7 +48,7 @@ public class SignInCommand extends Command {
 		String phone = request.getParameter("phone");
 		String password = request.getParameter("password");
 		
-		PersonService personService = new PersonService();
+		PersonService personService = new PersonService(new MySqlPersonDao(DBManager.getDataSource()));
 		Person person = personService.find(phone);
 		password = personService.hashPassword(password);
 		

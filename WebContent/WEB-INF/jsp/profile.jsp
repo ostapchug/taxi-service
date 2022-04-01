@@ -3,7 +3,6 @@
 <!DOCTYPE html>
 <html>
 <c:set var="title" value="Taxi Service | Profile"/>
-<c:set var="localePath" value="?command=profile_page&locale="/>
 <c:set var="profile" value="active" />
 <%@ include file="/WEB-INF/jspf/head.jspf"%>
 <body>
@@ -62,7 +61,7 @@
       </tr>
     </tbody>
   </table>
-  <a href="?command=profile_update_page" class="btn btn-success" role="button"><fmt:message key="general.button.anchor.edit"/></a>
+  <a href="?command=profile_update_page" class="btn btn-default" role="button"><fmt:message key="general.button.anchor.edit"/></a>
   </div>
 </div>
 </div>

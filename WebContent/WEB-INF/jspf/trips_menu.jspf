@@ -106,7 +106,7 @@
 	<c:if test="${not empty dateRange}">
 		<div class="col-md-2">
 			<form action = "?command=filter_trips" method="post">
-				<input type="text" name="phoneFilter" value = "<c:out value = '${phone}'/>" style = "display: none" >
+				<input type="hidden" name="phoneFilter" value = "<c:out value = '${phone}'/>">
 				<span class="label label-info">
 					<c:out value = "${dateRange}"/>
 					<button type="submit" class="btn btn-link" style = "width: 25px">
@@ -120,7 +120,7 @@
 	<c:if test="${not empty phone}">
 		<div class="col-md-2">
 			<form action = "?command=filter_trips" method="post">
-				<input type="text" name="dateFilter" value = "<c:out value = '${dateRange}'/>" style = "display: none" >
+				<input type="hidden" name="dateFilter" value = "<c:out value = '${dateRange}'/>">
 				<span class="label label-info">
 					<c:out value = "${phone}" />
 					<button type="submit" class="btn btn-link" style = "width: 25px">

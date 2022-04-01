@@ -1,3 +1,7 @@
+<%@ tag language="java" pageEncoding="ISO-8859-1"%>
+<%@ attribute name="currentPage" required="true"%>
+<%@ attribute name="totalPages" required="true"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <div class="text-center">
 	  <ul class="pagination pagination-sm">
 	    <li class="${currentPage == 1 ? 'disabled' : ''}">

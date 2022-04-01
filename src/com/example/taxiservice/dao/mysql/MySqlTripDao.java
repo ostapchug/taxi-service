@@ -10,11 +10,12 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.sql.DataSource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.example.taxiservice.dao.AbstractDao;
-import com.example.taxiservice.dao.DBManager;
 import com.example.taxiservice.dao.Fields;
 import com.example.taxiservice.dao.TripDao;
 import com.example.taxiservice.model.Car;
@@ -38,8 +39,8 @@ public class MySqlTripDao extends AbstractDao<Trip> implements TripDao{
 	
 	private static final Logger LOG = LoggerFactory.getLogger(MySqlTripDao.class);
 
-	public MySqlTripDao(DBManager dbManager) {
-		super(dbManager);
+	public MySqlTripDao(DataSource dataSource) {
+		super(dataSource);
 	}
 
 	@Override
@@ -73,7 +74,8 @@ public class MySqlTripDao extends AbstractDao<Trip> implements TripDao{
 	}
 
 	@Override
-	public void insert(Trip trip) {
+	public boolean insert(Trip trip) {
+		boolean result = false;
 		Connection connection = null;
 		PreparedStatement statement = null;
 		ResultSet set = null;
@@ -95,6 +97,7 @@ public class MySqlTripDao extends AbstractDao<Trip> implements TripDao{
 			}
 			
 			commit(connection);
+			result = true;
 			
 		} catch (SQLException e) {
 			rollback(connection);
@@ -103,22 +106,12 @@ public class MySqlTripDao extends AbstractDao<Trip> implements TripDao{
 			close(set, statement, connection);	
 		}
 		
-	}
-
-	@Override
-	public void update(Trip trip) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void delete(Trip trip) {
-		// TODO Auto-generated method stub
-		
+		return result;
 	}
 	
 	@Override
-	public void insert(Trip trip, Car... cars) {
+	public boolean insert(Trip trip, Car... cars) {
+		boolean result = false;
 		Connection connection = null;
 		PreparedStatement statement1 = null;
 		PreparedStatement statement2 = null;
@@ -148,14 +141,22 @@ public class MySqlTripDao extends AbstractDao<Trip> implements TripDao{
 			}
 			
 			commit(connection);
-			
+			result = true;
 		} catch (SQLException e) {
 			rollback(connection);
 			LOG.error(e.getMessage());
 		} finally {
 			close(statement2);
 			close(set, statement1, connection);	
-		}	
+		}
+		
+		return result;
+	}
+	
+	@Override
+	public boolean update(Trip entity) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 	@Override
@@ -449,7 +450,8 @@ public class MySqlTripDao extends AbstractDao<Trip> implements TripDao{
 	}
 
 	@Override
-	public void updateStatus(Trip trip, String status) {
+	public boolean updateStatus(Trip trip, String status) {
+		boolean result = false;
 		Connection connection = null;
 		PreparedStatement statement = null;
 		
@@ -461,13 +463,16 @@ public class MySqlTripDao extends AbstractDao<Trip> implements TripDao{
 			statement.executeUpdate();
 			
 			commit(connection);
+			result = true;
 			
 		}catch (SQLException e) {
 			rollback(connection);
 			LOG.error(e.getMessage());
 		} finally {
 			close(statement, connection);	
-		}	
+		}
+		
+		return result;
 		
 	}
 	

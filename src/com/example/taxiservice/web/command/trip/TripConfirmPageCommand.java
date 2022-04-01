@@ -10,6 +10,9 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.example.taxiservice.dao.DBManager;
+import com.example.taxiservice.dao.mysql.MySqlCategoryDao;
+import com.example.taxiservice.dao.mysql.MySqlLocationDao;
 import com.example.taxiservice.model.dto.TripConfirmDto;
 import com.example.taxiservice.service.CategoryService;
 import com.example.taxiservice.service.LocationService;
@@ -32,8 +35,8 @@ public class TripConfirmPageCommand extends Command {
 		String lang = (String) session.getAttribute("locale");
 		
 		if(tripConfirmDto != null) {
-			CategoryService categoryService = new CategoryService();
-			LocationService locationService = new LocationService();
+			CategoryService categoryService = new CategoryService(new MySqlCategoryDao(DBManager.getDataSource()));
+			LocationService locationService = new LocationService(new MySqlLocationDao(DBManager.getDataSource()));
 			
 			String category = categoryService.find(tripConfirmDto.getCategoryId(), lang).getName();
 			String origin = locationService.find(tripConfirmDto.getOriginId(), lang).toString();

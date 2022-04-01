@@ -8,6 +8,7 @@
 		    <th><fmt:message key="trips_jsp.anchor.date"/></th>
 		    <th><fmt:message key="trips_jsp.anchor.bill"/></th>
 		    <th><fmt:message key="trips_jsp.anchor.status"/></th>
+		     <th><fmt:message key="trips_jsp.anchor.details"/></th>
 	    </tr>
 	</thead>
   	<tbody>
@@ -16,14 +17,14 @@
     		<td><c:out value="${trip.personPhone}"/></td>
   			<td><c:out value="${trip.origin}"/></td>
   			<td><c:out value="${trip.destination}"/></td>
-  			<td><c:out value="${trip.distance}"/></td>
-  			<td><c:out value="${trip.date}"/></td>
-  			<td><c:out value="${trip.bill}"/></td>
+  			<td><fmt:formatNumber value="${trip.distance}" type = "number"/></td>  
+  			<td><fmt:formatDate pattern="dd.MM.yyyy, HH:mm:ss" value="${trip.date}"/></td>
+  			<td><fmt:formatNumber value="${trip.bill}" type = "number"/></td>
   			<td>
  			    <c:if test = "${trip.status == 'new'}">
  			    	<form action = "?command=trip_status" method="post">
- 			    		<input type="text" name="tripId" value = "<c:out value = '${trip.id}'/>" style = "display: none">
-						<input type="text" name="tripStatus" style = "display: none">
+ 			    		<input type="hidden" name="tripId" value = "<c:out value = '${trip.id}'/>">
+						<input type="hidden" name="tripStatus">
 	 					<div class="dropdown">
 						  <button class="btn btn-info btn-sm dropdown-toggle" type="submit" style = "width: 100%" data-toggle="dropdown">
 						  	<fmt:message key="trips_jsp.anchor.status.new"/>
@@ -41,8 +42,8 @@
       
 		        <c:if test = "${trip.status == 'accepted'}">
 		        	<form action = "?command=trip_status" method="post">
- 			    		<input type="text" name="tripId" value = "<c:out value = '${trip.id}'/>" style = "display: none">
-						<input type="text" name="tripStatus" style = "display: none">
+ 			    		<input type="hidden" name="tripId" value = "<c:out value = '${trip.id}'/>">
+						<input type="hidden" name="tripStatus">
 			            <div class="dropdown">
 						  <button class="btn btn-primary btn-sm dropdown-toggle" type="button" style = "width: 100%" data-toggle="dropdown" ${personRole == 'admin' ? '' : 'disabled'}>
 						  	<fmt:message key="trips_jsp.anchor.status.accepted"/>
@@ -67,6 +68,12 @@
 					  <fmt:message key="trips_jsp.anchor.status.cancelled"/>
 					</button>
 		        </c:if>
+  			</td>
+  			
+  			<td>
+				<a href="?command=trip_page&trip=<c:out value = '${trip.id}'/>" class="btn btn-default btn-sm" role="button">
+					<span class = "glyphicon glyphicon-new-window"></span>
+				</a>
   			</td>
   		</tr>
     </c:forEach>

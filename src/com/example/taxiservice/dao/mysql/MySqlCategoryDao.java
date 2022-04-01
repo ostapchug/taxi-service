@@ -8,12 +8,13 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.sql.DataSource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.example.taxiservice.dao.AbstractDao;
 import com.example.taxiservice.dao.CategoryDao;
-import com.example.taxiservice.dao.DBManager;
 import com.example.taxiservice.dao.Fields;
 import com.example.taxiservice.model.Category;
 
@@ -22,7 +23,6 @@ public class MySqlCategoryDao extends AbstractDao<Category> implements CategoryD
 	private static final String SQL__FIND_CATEGORY_BY_ID = "SELECT * FROM car_category WHERE cc_id=?";
 	private static final String SQL__INSERT_CATEGORY = "INSERT INTO car_category (cc_name, cc_price) VALUES (?,?)";
 	private static final String SQL__UPDATE_CATEGORY = "UPDATE car_category SET cc_name=?, cc_price=? WHERE cc_id = ?";
-	private static final String SQL__DELETE_CATEGORY = "DELETE FROM car_category WHERE cc_id = ?";
 	private static final String SQL__SELECT_ALL_CATEGORY = "SELECT * FROM car_category";
 	private static final String SQL__FIND_CATEGORY_BY_ID_AND_LOCALE = "SELECT cc_id, cct_name AS cc_name, cc_price FROM car_category " +
 																	  "INNER JOIN car_category_translation ON cc_id = cct_car_category " +
@@ -33,8 +33,8 @@ public class MySqlCategoryDao extends AbstractDao<Category> implements CategoryD
 	
 	private static final Logger LOG = LoggerFactory.getLogger(MySqlCategoryDao.class);
 
-	public MySqlCategoryDao(DBManager dbManager) {
-		super(dbManager);
+	public MySqlCategoryDao(DataSource dataSource) {
+		super(dataSource);
 	}
 
 	@Override
@@ -101,7 +101,8 @@ public class MySqlCategoryDao extends AbstractDao<Category> implements CategoryD
 	}
 
 	@Override
-	public void insert(Category category) {
+	public boolean insert(Category category) {
+		boolean result = false;
 		Connection connection = null;
 		PreparedStatement statement = null;
 		ResultSet set = null;
@@ -119,6 +120,7 @@ public class MySqlCategoryDao extends AbstractDao<Category> implements CategoryD
 			}
 			
 			commit(connection);
+			result = true;
 			
 		} catch (SQLException e) {
 			rollback(connection);
@@ -127,10 +129,13 @@ public class MySqlCategoryDao extends AbstractDao<Category> implements CategoryD
 			close(set, statement, connection);	
 		}
 		
+		return result;
+		
 	}
 
 	@Override
-	public void update(Category category) {
+	public boolean update(Category category) {
+		boolean result = false;
 		Connection connection = null;
 		PreparedStatement statement = null;
 		
@@ -143,28 +148,7 @@ public class MySqlCategoryDao extends AbstractDao<Category> implements CategoryD
 			statement.executeUpdate();
 			
 			commit(connection);
-			
-		}catch (SQLException e) {
-			rollback(connection);
-			LOG.error(e.getMessage());
-		} finally {
-			close(statement, connection);	
-		}	
-		
-	}
-
-	@Override
-	public void delete(Category category) {
-		Connection connection = null;
-		PreparedStatement statement = null;
-		
-		try {
-			connection = getConnection();
-			statement = connection.prepareStatement(SQL__DELETE_CATEGORY);
-			statement.setLong(1, category.getId());
-			statement.executeUpdate();
-			
-			commit(connection);
+			result = true;
 			
 		}catch (SQLException e) {
 			rollback(connection);
@@ -172,6 +156,8 @@ public class MySqlCategoryDao extends AbstractDao<Category> implements CategoryD
 		} finally {
 			close(statement, connection);	
 		}
+		
+		return result;
 		
 	}
 

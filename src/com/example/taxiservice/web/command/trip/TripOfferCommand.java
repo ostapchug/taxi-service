@@ -14,6 +14,11 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.example.taxiservice.dao.DBManager;
+import com.example.taxiservice.dao.mysql.MySqlCarDao;
+import com.example.taxiservice.dao.mysql.MySqlCategoryDao;
+import com.example.taxiservice.dao.mysql.MySqlLocationDao;
+import com.example.taxiservice.dao.mysql.MySqlTripDao;
 import com.example.taxiservice.model.Car;
 import com.example.taxiservice.model.Category;
 import com.example.taxiservice.model.dto.TripConfirmDto;
@@ -57,8 +62,8 @@ public class TripOfferCommand extends Command {
 
 		String offer = request.getParameter("offer");
 		
-		CarService carService = new CarService();
-		LocationService locationService = new LocationService();
+		CarService carService = new CarService(new MySqlCarDao(DBManager.getDataSource()));
+		LocationService locationService = new LocationService(new MySqlLocationDao(DBManager.getDataSource()));
 		
 		if(tripOffer != null) {
 			long categoryId = tripOffer.getCategoryId();
@@ -115,13 +120,13 @@ public class TripOfferCommand extends Command {
 	}
 	
 	private TripConfirmDto getTripConfirm(long personId, long categoryId, int capacity, long originId, long destId, BigDecimal distance, int waitTime, Car [] cars) {
-		TripService tripService = new TripService();
-		CategoryService categoryService = new CategoryService();
+		TripService tripService = new TripService(new MySqlTripDao(DBManager.getDataSource()));
+		CategoryService categoryService = new CategoryService(new MySqlCategoryDao(DBManager.getDataSource()));
 		Category category = categoryService.find(categoryId);
 		
 		BigDecimal categoryPrice = category.getPrice().multiply(new BigDecimal(cars.length));
 		BigDecimal price = categoryPrice.multiply(distance).setScale(SCALE, RoundingMode.HALF_UP);
-		BigDecimal discount = tripService.getDiscount(personId).setScale(SCALE, RoundingMode.HALF_UP);
+		BigDecimal discount = tripService.getDiscount(personId, price).setScale(SCALE, RoundingMode.HALF_UP);
 		BigDecimal total = price.subtract(discount);
 		
 		TripConfirmDto result = new TripConfirmDto();

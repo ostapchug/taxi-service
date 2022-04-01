@@ -70,16 +70,12 @@ body {
 	color: #222;
 }
 
-.taxi-dropdown{
-	
-}
-
 .empty-template, .error-template {
 	padding: 40px 15px;
 	text-align: center;
 }
 
-.help-block{
+.help-block, .error-details {
 	color: #FF0000;
 }
 

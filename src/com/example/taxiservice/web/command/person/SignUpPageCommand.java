@@ -44,7 +44,10 @@ public class SignUpPageCommand extends Command {
 				case "surname":
 					request.setAttribute("errorSurname", "error.label.anchor.format");
 					break;
-	
+				case "profile_create":
+					request.setAttribute("errorMessage", "error.label.anchor.profile_create");
+					break;
+					
 				default:
 					break;
 				}

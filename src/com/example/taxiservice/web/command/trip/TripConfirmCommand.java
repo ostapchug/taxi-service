@@ -10,6 +10,8 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.example.taxiservice.dao.DBManager;
+import com.example.taxiservice.dao.mysql.MySqlTripDao;
 import com.example.taxiservice.model.Trip;
 import com.example.taxiservice.model.dto.TripConfirmDto;
 import com.example.taxiservice.service.TripService;
@@ -55,12 +57,17 @@ public class TripConfirmCommand extends Command {
 			trip.setDistance(tripConfirm.getDistance());
 			trip.setBill(tripConfirm.getTotal());
 			
-			TripService tripService = new TripService();
-			tripService.insert(trip, tripConfirm.getCars());	
-			result = new Page(Path.COMMAND__TRIPS_PAGE, true);
+			TripService tripService = new TripService(new MySqlTripDao(DBManager.getDataSource()));
+			boolean inserted = tripService.insert(trip, tripConfirm.getCars());
+			
+			if(inserted) {
+				result = new Page(Path.COMMAND__TRIPS_PAGE, true);
+			}else {
+				result = new Page(Path.COMMAND__NEW_TRIP_PAGE + "&error=trip_create", true);
+			}
 			
 		}else {
-			result = new Page(Path.COMMAND__NEW_TRIP_PAGE + "&error=trip", true);
+			result = new Page(Path.COMMAND__NEW_TRIP_PAGE + "&error=trip_create", true);
 		}		
 		
 		return result;

@@ -10,10 +10,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.example.taxiservice.dao.DBManager;
 import com.example.taxiservice.dao.Fields;
 import com.example.taxiservice.dao.TripDao;
-import com.example.taxiservice.dao.mysql.MySqlTripDao;
 import com.example.taxiservice.model.Car;
 import com.example.taxiservice.model.Trip;
 
@@ -23,16 +21,16 @@ public class TripService {
 	
 	private TripDao tripDao;
 
-	public TripService() {
-		this.tripDao = new MySqlTripDao(DBManager.getInstance());
+	public TripService(TripDao tripDao) {
+		this.tripDao = tripDao;
 	}
 	
 	public Trip find(Long id) {
 		return tripDao.find(id);
 	}
 	
-	public void insert (Trip trip, Car... cars) {
-		tripDao.insert(trip, cars);
+	public boolean insert (Trip trip, Car... cars) {
+		return tripDao.insert(trip, cars);
 	}
 	
 	public List<Trip> findAll(int offset, int count, String sorting){
@@ -63,22 +61,22 @@ public class TripService {
 		return tripDao.findAllByPersonIdAndDate(personId, range, offset, count, field);
 	}
 	
-	public void updateStatus(Trip trip, String status) {
-		tripDao.updateStatus(trip, status);
+	public boolean updateStatus(Trip trip, String status) {
+		return tripDao.updateStatus(trip, status);
 	}
 	
-	public BigDecimal getDiscount(Long personId) {
+	public BigDecimal getDiscount(Long personId, BigDecimal bill) {
 		BigDecimal result = null;
 		BigDecimal totalBill = tripDao.getTotalBill(personId);
 		
 		if(totalBill.compareTo(new BigDecimal(100)) >= 0) {
-			result = totalBill.multiply(new BigDecimal(0.02));
+			result = bill.multiply(new BigDecimal(0.02));
 			
 		}else if(totalBill.compareTo(new BigDecimal(500)) >= 0) {
-			result = totalBill.multiply(new BigDecimal(0.05));
+			result = bill.multiply(new BigDecimal(0.05));
 			
 		}else if(totalBill.compareTo(new BigDecimal(1000)) >= 0) {
-			result = totalBill.multiply(new BigDecimal(0.10));
+			result = bill.multiply(new BigDecimal(0.10));
 		}else {
 			result = new BigDecimal(0);
 		}

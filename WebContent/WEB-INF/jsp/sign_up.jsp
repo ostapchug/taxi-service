@@ -3,7 +3,6 @@
 <!DOCTYPE html>
 <html>
 <c:set var="title" value="Taxi Service | Sign Up"/>
-<c:set var="localePath" value="?command=sign_up_page&locale="/>
 <%@ include file="/WEB-INF/jspf/head.jspf"%>
 <body>
 <%@ include file="/WEB-INF/jspf/navbar.jspf"%>

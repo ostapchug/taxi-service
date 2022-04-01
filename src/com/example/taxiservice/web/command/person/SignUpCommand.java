@@ -9,6 +9,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.example.taxiservice.dao.DBManager;
+import com.example.taxiservice.dao.mysql.MySqlPersonDao;
 import com.example.taxiservice.model.Person;
 import com.example.taxiservice.service.PersonService;
 import com.example.taxiservice.web.Page;
@@ -45,7 +47,7 @@ public class SignUpCommand extends Command {
 		String name = request.getParameter("name");
 		String surname = request.getParameter("surname");
 		
-		PersonService personService = new PersonService();
+		PersonService personService = new PersonService(new MySqlPersonDao(DBManager.getDataSource()));
 		
 		if(!personService.validatePhone(phone)) {
 			errorMessage = "phone_format";
@@ -75,11 +77,15 @@ public class SignUpCommand extends Command {
 			person.setSurname(surname);
 			person.setRoleId(1);
 				
-			personService.insert(person);
-						
-			result = new Page(Path.COMMAND__SIGN_IN_PAGE, true);	
-		}else {			
+			boolean inserted = personService.insert(person);
 			
+			if(inserted) {
+				result = new Page(Path.COMMAND__SIGN_IN_PAGE, true);
+			}else {
+				result = new Page(Path.COMMAND__SIGN_UP_PAGE + "&error=profile_create", true);
+			}			
+				
+		}else {			
 			result = new Page(Path.COMMAND__SIGN_UP_PAGE + "&error=" + errorMessage, true);
 		}
 		

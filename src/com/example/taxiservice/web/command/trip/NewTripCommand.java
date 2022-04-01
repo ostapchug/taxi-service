@@ -12,6 +12,11 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.example.taxiservice.dao.DBManager;
+import com.example.taxiservice.dao.mysql.MySqlCarDao;
+import com.example.taxiservice.dao.mysql.MySqlCategoryDao;
+import com.example.taxiservice.dao.mysql.MySqlLocationDao;
+import com.example.taxiservice.dao.mysql.MySqlTripDao;
 import com.example.taxiservice.model.Car;
 import com.example.taxiservice.model.Category;
 import com.example.taxiservice.model.dto.TripConfirmDto;
@@ -80,10 +85,10 @@ public class NewTripCommand extends Command {
 		Page result = null;
 		
 		long personId = (long) session.getAttribute("personId");
-		TripService tripService = new TripService();
-		CategoryService categoryService = new CategoryService();
-		CarService carService = new CarService();
-		LocationService locationService = new LocationService();
+		TripService tripService = new TripService(new MySqlTripDao(DBManager.getDataSource()));
+		CategoryService categoryService = new CategoryService(new MySqlCategoryDao(DBManager.getDataSource()));
+		CarService carService = new CarService(new MySqlCarDao(DBManager.getDataSource()));
+		LocationService locationService = new LocationService(new MySqlLocationDao(DBManager.getDataSource()));
 		BigDecimal distance = locationService.findDistance(originId, destinationId).setScale(SCALE, RoundingMode.HALF_UP);
 		Category category = categoryService.find(categoryId);		
 		Car car = carService.find(categoryId, capacity);
@@ -94,7 +99,7 @@ public class NewTripCommand extends Command {
 				
 				BigDecimal categoryPrice = category.getPrice();
 				BigDecimal price = categoryPrice.multiply(distance).setScale(SCALE, RoundingMode.HALF_UP);
-				BigDecimal discount = tripService.getDiscount(personId).setScale(SCALE, RoundingMode.HALF_UP);
+				BigDecimal discount = tripService.getDiscount(personId, price).setScale(SCALE, RoundingMode.HALF_UP);
 				BigDecimal total = price.subtract(discount);		
 
 				BigDecimal distanceToCar = locationService.findDistance(originId, car.getLocationId());

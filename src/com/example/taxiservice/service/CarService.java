@@ -6,8 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.example.taxiservice.dao.CarDao;
-import com.example.taxiservice.dao.DBManager;
-import com.example.taxiservice.dao.mysql.MySqlCarDao;
 import com.example.taxiservice.model.Car;
 
 public class CarService {
@@ -15,8 +13,8 @@ public class CarService {
 	
 	private CarDao carDao;
 
-	public CarService() {
-		this.carDao = new MySqlCarDao(DBManager.getInstance());
+	public CarService(CarDao carDao) {
+		this.carDao = carDao;
 	}
 	
 	public Car find(Long id) {
@@ -33,6 +31,10 @@ public class CarService {
 	
 	public List<Car> findCars(Long categoryId, Integer capacity){
 		return carDao.findCars(categoryId, capacity);
+	}
+	
+	public List<Car> findCarsByTripId(Long id){
+		return carDao.findCarsByTripId(id);
 	}
 	
 }

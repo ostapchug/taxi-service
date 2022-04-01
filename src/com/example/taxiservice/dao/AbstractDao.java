@@ -5,6 +5,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import javax.sql.DataSource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,14 +17,14 @@ import org.slf4j.LoggerFactory;
  * 
  * @param <T> - entity type
  */
-public abstract class AbstractDao<T> {
+public abstract class AbstractDao<T> implements EntityDao<T>{
 	
 	private static final Logger LOG = LoggerFactory.getLogger(AbstractDao.class);
 	
-	protected final DBManager dbManager;
+	protected final DataSource dataSource;
 	
-	public AbstractDao(DBManager dbManager) {
-		this.dbManager = dbManager;
+	public AbstractDao(DataSource dataSource) {
+		this.dataSource = dataSource;
 	}
 
 	/**
@@ -30,7 +32,7 @@ public abstract class AbstractDao<T> {
 	 * @throws SQLException
 	 */
 	protected Connection getConnection() throws SQLException {
-		return dbManager.getConnection();
+		return dataSource.getConnection();
 	}
 	
 	/**

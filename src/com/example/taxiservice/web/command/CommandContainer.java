@@ -6,7 +6,8 @@ import java.util.TreeMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.example.taxiservice.web.command.person.ProfileDeleteCommand;
+import com.example.taxiservice.web.command.common.ErrorPageCommand;
+import com.example.taxiservice.web.command.common.HomePageCommand;
 import com.example.taxiservice.web.command.person.ProfilePageCommand;
 import com.example.taxiservice.web.command.person.ProfileUpdateCommand;
 import com.example.taxiservice.web.command.person.ProfileUpdatePageCommand;
@@ -22,6 +23,7 @@ import com.example.taxiservice.web.command.trip.TripConfirmCommand;
 import com.example.taxiservice.web.command.trip.TripConfirmPageCommand;
 import com.example.taxiservice.web.command.trip.TripOfferCommand;
 import com.example.taxiservice.web.command.trip.TripOfferPageCommand;
+import com.example.taxiservice.web.command.trip.TripPageCommand;
 import com.example.taxiservice.web.command.trip.TripStatusCommand;
 import com.example.taxiservice.web.command.trip.TripsPageCommand;
 
@@ -45,14 +47,13 @@ public class CommandContainer {
 		commands.put("sign_in", new SignInCommand());
 		commands.put("sign_out", new SignOutCommand());
 		commands.put("sign_up", new SignUpCommand());
-		commands.put("no_command", new NoCommand());
 		
 		// client commands
 		commands.put("profile_page", new ProfilePageCommand());
 		commands.put("profile_update_page", new ProfileUpdatePageCommand());
 		commands.put("profile_update", new ProfileUpdateCommand());
-		commands.put("profile_delete", new ProfileDeleteCommand());
 		commands.put("new_trip_page", new NewTripPageCommand());
+		commands.put("trip_page", new TripPageCommand());
 		commands.put("new_trip", new NewTripCommand());
 		commands.put("trips_page", new TripsPageCommand());
 		commands.put("trip_confirm_page", new TripConfirmPageCommand());
@@ -80,7 +81,7 @@ public class CommandContainer {
 			return commands.get("home_page");
 		}else if(!commands.containsKey(commandName)) {
 			LOG.debug("Command not found, name --> " + commandName);
-			return commands.get("no_command"); 			
+			return commands.get("home_page");		
 		}
 		
 		return commands.get(commandName);

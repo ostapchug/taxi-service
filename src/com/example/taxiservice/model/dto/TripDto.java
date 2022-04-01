@@ -1,6 +1,10 @@
 package com.example.taxiservice.model.dto;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
+import java.util.List;
+
+import com.example.taxiservice.model.Car;
 
 public class TripDto {
 	private Long id;
@@ -8,9 +12,10 @@ public class TripDto {
 	private String origin;
 	private String destination;
 	private BigDecimal distance;
-	private String date;
+	private Timestamp date;
 	private BigDecimal bill;
 	private String status;
+	private List<Car> cars;
 	
 	public Long getId() {
 		return id;
@@ -42,10 +47,10 @@ public class TripDto {
 	public void setDistance(BigDecimal distance) {
 		this.distance = distance;
 	}
-	public String getDate() {
+	public Timestamp getDate() {
 		return date;
 	}
-	public void setDate(String date) {
+	public void setDate(Timestamp date) {
 		this.date = date;
 	}
 	public BigDecimal getBill() {
@@ -59,6 +64,12 @@ public class TripDto {
 	}
 	public void setStatus(String status) {
 		this.status = status;
+	}
+	public List<Car> getCars() {
+		return cars;
+	}
+	public void setCars(List<Car> cars) {
+		this.cars = cars;
 	}
 
 }

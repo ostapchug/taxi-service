@@ -8,12 +8,13 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.sql.DataSource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.example.taxiservice.dao.AbstractDao;
 import com.example.taxiservice.dao.CarDao;
-import com.example.taxiservice.dao.DBManager;
 import com.example.taxiservice.dao.Fields;
 import com.example.taxiservice.model.Car;
 
@@ -22,12 +23,13 @@ public class MySqlCarDao extends AbstractDao<Car> implements CarDao {
 	private static final String SQL__FIND_CAR_BY_ID = "SELECT * FROM car WHERE c_id=?";
 	private static final String SQL__FIND_CAR_BY_CATEGORY_AND_CAPACITY = "SELECT * FROM car INNER JOIN car_model ON c_model = cm_id WHERE c_category=? AND c_status=0 AND cm_seat_count >=? ORDER BY cm_seat_count LIMIT 1";
 	private static final String SQL__FIND_CAR_BY_CAPACITY = "SELECT * FROM car INNER JOIN car_model ON c_model = cm_id WHERE c_status=0 AND cm_seat_count >=? ORDER BY cm_seat_count LIMIT 1";
+	private static final String SQL__FIND_CARS_BY_TRIP_ID = "SELECT * FROM car INNER JOIN m2m_trip_car ON car.c_id = m2m_trip_car.c_id WHERE t_id = ?";
 	private static final String SQL__CALL_GET_CARS = "{CALL get_cars(?,?)}";
 	
 	private static final Logger LOG = LoggerFactory.getLogger(MySqlCarDao.class);
 
-	public MySqlCarDao(DBManager dbManager) {
-		super(dbManager);
+	public MySqlCarDao(DataSource dataSource) {
+		super(dataSource);
 	}
 	
 	@Override
@@ -60,23 +62,18 @@ public class MySqlCarDao extends AbstractDao<Car> implements CarDao {
 		
 		return car;
 	}
-
+	
+	
 	@Override
-	public void insert(Car car) {
+	public boolean insert(Car entity) {
 		// TODO Auto-generated method stub
-		
+		return false;
 	}
 
 	@Override
-	public void update(Car car) {
+	public boolean update(Car entity) {
 		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void delete(Car car) {
-		// TODO Auto-generated method stub
-		
+		return false;
 	}
 	
 	@Override
@@ -169,6 +166,38 @@ public class MySqlCarDao extends AbstractDao<Car> implements CarDao {
 		} finally {
 			close(statement, connection);			
 		}		
+		
+		return result;
+	}
+	
+	@Override
+	public List<Car> findCarsByTripId(Long id) {
+		List<Car> result = new ArrayList<>();
+		Car car = null;
+		
+		Connection connection = null;
+		CallableStatement statement = null;
+		ResultSet set = null;
+		
+		try {
+			connection = getConnection();
+			statement = connection.prepareCall(SQL__FIND_CARS_BY_TRIP_ID);
+			statement.setLong(1, id);
+			set = statement.executeQuery();
+			
+			while (set.next()) {
+				car = mapRow(set);	
+				result.add(car);
+			}
+			
+			commit(connection);
+			
+		} catch (SQLException e) {
+			rollback(connection);
+			LOG.error(e.getMessage());
+		} finally {
+			close(statement, connection);			
+		}
 		
 		return result;
 	}

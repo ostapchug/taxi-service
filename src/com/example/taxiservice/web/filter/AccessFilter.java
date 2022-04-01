@@ -29,7 +29,6 @@ public class AccessFilter implements Filter {
 	private static final Logger LOG = LoggerFactory.getLogger(AccessFilter.class);
 	
 	// commands access
-//	private static Map<Role, List<String>> accessMap = new HashMap<Role, List<String>>();
 	private static List<String> user = new ArrayList<String>();	
 	private static List<String> guest = new ArrayList<String>();
 	private static List<String> common = new ArrayList<String>();

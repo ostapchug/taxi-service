@@ -3,8 +3,6 @@
 <!DOCTYPE html>
 <html>
 <c:set var="title" value="Taxi Service | Trip Confirm"/>
-<c:set var="localePath" value="?command=trip_confirm_page&locale="/>
-
 <%@ include file="/WEB-INF/jspf/head.jspf"%>
 <body>
 <%@ include file="/WEB-INF/jspf/navbar.jspf"%>
@@ -50,7 +48,7 @@
       <tr>
         <td>
         <strong>
-        <span class="glyphicon glyphicon-arrow-right text-primary"></span>
+        <span class="glyphicon glyphicon-map-marker text-primary"></span>
         <fmt:message key="general.label.anchor.origin"/>
         </strong>
         </td>
@@ -59,7 +57,7 @@
       <tr>
         <td>
         <strong>
-        <span class="glyphicon glyphicon-arrow-left text-primary"></span>
+        <span class="glyphicon glyphicon-map-marker text-primary"></span>
         <fmt:message key="general.label.anchor.destination"/>
         </strong>
         </td>
@@ -72,7 +70,7 @@
         <fmt:message key="general.label.anchor.distance"/>
         </strong>
         </td>
-        <td><c:out value="${tripConfirm.distance}"/></td>
+        <td><fmt:formatNumber value="${tripConfirm.distance}" type = "number"/></td>
       </tr>
       <tr>
         <td>
@@ -81,7 +79,7 @@
         <fmt:message key="general.label.anchor.price"/>
         </strong>
         </td>
-        <td><c:out value="${tripConfirm.price}"/></td>
+        <td><fmt:formatNumber value="${tripConfirm.price}" type = "number"/></td>
       </tr>
       <tr>
         <td>
@@ -90,7 +88,7 @@
         <fmt:message key="general.label.anchor.discount"/>
         </strong>
         </td>
-        <td><c:out value="${tripConfirm.discount}"/></td>
+        <td><fmt:formatNumber value="${tripConfirm.discount}" type = "number"/></td>
       </tr>
       <tr>
         <td>
@@ -99,7 +97,7 @@
         <fmt:message key="general.label.anchor.total"/>
         </strong>
         </td>
-        <td><c:out value="${tripConfirm.total}"/></td>
+        <td><fmt:formatNumber value="${tripConfirm.total}" type = "number"/></td>
       </tr>
       <tr>
         <td>
@@ -124,7 +122,7 @@
     </tbody>
   </table>
   	<form action = "?command=trip_confirm" method="post">
-	  	<input type="text" name="confirm" value = "confirmed" style = "display: none">
+	  	<input type="hidden" name="confirm" value = "confirmed">
 		<div class = "text-center">
 			<button type="submit" class="btn btn-success"><fmt:message key="general.button.anchor.submit"/></button>&nbsp;
 			<a href="?command=new_trip_page" class="btn btn-danger" role="button"><fmt:message key="general.button.anchor.cancel"/></a>

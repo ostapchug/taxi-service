@@ -3,7 +3,6 @@
 <!DOCTYPE html>
 <html>
 <c:set var="title" value="Taxi Service | Trips"/>
-<c:set var="localePath" value="?command=trips_page&locale="/>
 <c:set var="trips" value="active" />
 <%@ include file="/WEB-INF/jspf/head.jspf"%>
 <%@ include file="/WEB-INF/jspf/datepicker.jspf"%>
@@ -25,11 +24,11 @@
 				<strong>
 					<fmt:message key="general.label.anchor.error"/>
 				</strong>
-				<fmt:message key="error.label.anchor.format"/>
+				<fmt:message key="${errorMessage}"/>
 			</div>    		
 		</c:if>
 
-		<div class="col-md-offset-1 col-md-10 inf-content">
+		<div class="inf-content">
 			<h3><fmt:message key="trips_jsp.anchor.info"/></h3>
 			<hr>
 	
@@ -50,7 +49,7 @@
 			</c:choose>
 	
 			<c:if test = "${totalPages > 1}">
-				<%@ include file="/WEB-INF/jspf/pager.jspf"%>
+				<p:pager currentPage="${currentPage}" totalPages = "${totalPages}"/>
 			</c:if>
 		
 		</div>

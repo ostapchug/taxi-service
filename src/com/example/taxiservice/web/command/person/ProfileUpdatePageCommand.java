@@ -46,6 +46,9 @@ public class ProfileUpdatePageCommand extends Command {
 				case "surname":
 					request.setAttribute("errorSurname", "error.label.anchor.format");
 					break;
+				case "profile_update":
+					request.setAttribute("errorMessage", "error.label.anchor.profile_update");
+					break;
 	
 				default:
 					break;

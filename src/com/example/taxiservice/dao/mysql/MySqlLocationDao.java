@@ -10,11 +10,12 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.sql.DataSource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.example.taxiservice.dao.AbstractDao;
-import com.example.taxiservice.dao.DBManager;
 import com.example.taxiservice.dao.Fields;
 import com.example.taxiservice.dao.LocationDao;
 import com.example.taxiservice.model.Location;
@@ -33,8 +34,8 @@ public class MySqlLocationDao extends AbstractDao<Location> implements LocationD
 	
 	private static final Logger LOG = LoggerFactory.getLogger(MySqlLocationDao.class);
 	
-	public MySqlLocationDao(DBManager dbManager) {
-		super(dbManager);
+	public MySqlLocationDao(DataSource dataSource) {
+		super(dataSource);
 	}
 
 	@Override
@@ -99,20 +100,17 @@ public class MySqlLocationDao extends AbstractDao<Location> implements LocationD
 		return result;
 		
 	}
-
+	
 	@Override
-	public void insert(Location entity) {
-				
+	public boolean insert(Location entity) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 	@Override
-	public void update(Location entity) {
-				
-	}
-
-	@Override
-	public void delete(Location entity) {
-				
+	public boolean update(Location entity) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 	
 	@Override

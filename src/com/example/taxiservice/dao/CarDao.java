@@ -9,5 +9,7 @@ public interface CarDao extends EntityDao<Car> {
 	
 	Car findByCapacity(Integer capacity);
 	
+	List<Car> findCarsByTripId(Long id);
+	
 	List<Car> findCars(Long categoryId, Integer capacity);
 }

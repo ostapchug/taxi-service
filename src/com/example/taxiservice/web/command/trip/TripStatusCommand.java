@@ -10,6 +10,8 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.example.taxiservice.dao.DBManager;
+import com.example.taxiservice.dao.mysql.MySqlTripDao;
 import com.example.taxiservice.model.Role;
 import com.example.taxiservice.model.Trip;
 import com.example.taxiservice.model.TripStatus;
@@ -21,7 +23,6 @@ import com.example.taxiservice.web.command.Command;
 public class TripStatusCommand extends Command {
 
 	private static final long serialVersionUID = -6013088980177879712L;
-	
 	private static final Logger LOG = LoggerFactory.getLogger(TripStatusCommand.class);
 	
 	@Override
@@ -39,6 +40,8 @@ public class TripStatusCommand extends Command {
 	}
 	
 	private Page doPost(HttpServletRequest request, HttpServletResponse response) {
+		Page result = null;
+		String errorMessage = null;
 		
 		HttpSession session = request.getSession(false);
 		String role = (String) session.getAttribute("personRole");
@@ -48,32 +51,48 @@ public class TripStatusCommand extends Command {
 		String id = request.getParameter("tripId");
 		long tripId;
 		Trip trip = null;
-		TripService tripService = new TripService();
+		TripService tripService = new TripService(new MySqlTripDao(DBManager.getDataSource()));
 		
 		try {
 			tripId = Long.parseLong(id);
 			trip = tripService.find(tripId);
 		}catch(NumberFormatException e) {
-			LOG.debug("tipId parameter is not a number");		
+			errorMessage = "trip_status";
 		}		
 		
 		if(Role.ADMIN.getName().equals(role)) {
 			
 			if(status != null && trip != null) {
-				tripService.updateStatus(trip, status);
+				boolean updated = tripService.updateStatus(trip, status);
+				
+				if(!updated) {
+					errorMessage = "trip_status";
+				}
 			}
 			
 		}else {
 			
 			if(status != null && trip != null && status.equals(TripStatus.CANCELLED.getName())) {
-				if(trip.getPersonId().equals(personId)) {
-					tripService.updateStatus(trip, status);
+				TripStatus tripStatus = TripStatus.getTripStatus(trip);
+				if(trip.getPersonId().equals(personId) && tripStatus.getName().equals(TripStatus.NEW.getName())) {
+					boolean updated = tripService.updateStatus(trip, status);
+					
+					if(!updated) {
+						errorMessage = "trip_status";
+					}
+				}else {
+					errorMessage = "trip_status";
 				}
 			}
 		}
 		
-		return new Page(Path.COMMAND__TRIPS_PAGE, true);
-	}
-	
+		if(errorMessage == null) {
+			result = new Page(Path.COMMAND__TRIPS_PAGE, true);
+		}else {
+			result = new Page(Path.COMMAND__TRIPS_PAGE +"&error=" + errorMessage, true);
+		}
+		
+		return result;
+	}	
 
 }

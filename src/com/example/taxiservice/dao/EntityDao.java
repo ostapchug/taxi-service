@@ -21,20 +21,13 @@ public interface EntityDao<T> {
 	 *
 	 * @param entity - object to be saved
 	 */
-	void insert (T entity);
+	boolean insert (T entity);
 	
 	/**
 	 *Updates object in DB
 	 *
 	 * @param entity - object to be updated
 	 */
-	void update (T entity);
-	
-	/**
-	 *Deletes object from DB
-	 *
-	 * @param entity - object to be deleted
-	 */
-	void delete (T entity);
+	boolean update (T entity);
 
 }

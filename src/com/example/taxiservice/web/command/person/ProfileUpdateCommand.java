@@ -9,6 +9,8 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.example.taxiservice.dao.DBManager;
+import com.example.taxiservice.dao.mysql.MySqlPersonDao;
 import com.example.taxiservice.model.Person;
 import com.example.taxiservice.service.PersonService;
 import com.example.taxiservice.web.Page;
@@ -46,7 +48,7 @@ public class ProfileUpdateCommand extends Command{
 		String name = request.getParameter("name");
 		String surname = request.getParameter("surname");
 		
-		PersonService personService = new PersonService();
+		PersonService personService = new PersonService(new MySqlPersonDao(DBManager.getDataSource()));
 		
 		if(!personService.validatePhone(phone)) {
 			errorMessage = "phone_format";
@@ -80,14 +82,18 @@ public class ProfileUpdateCommand extends Command{
 			person.setSurname(surname);
 			person.setRoleId(1);
 				
-			personService.update(person);
+			boolean updated = personService.update(person);
 			
-			//update session attributes
-			session.setAttribute("personPhone", phone);
-			session.setAttribute("personName", name);
-			session.setAttribute("personSurname", surname);
-			
-			result = new Page(Path.COMMAND__PROFILE_PAGE, true);	
+			if(updated) {
+				//update session attributes
+				session.setAttribute("personPhone", phone);
+				session.setAttribute("personName", name);
+				session.setAttribute("personSurname", surname);
+				result = new Page(Path.COMMAND__PROFILE_PAGE, true);
+			}else {
+				result = new Page(Path.COMMAND__PROFILE_UPDATE_PAGE + "&error=profile_update", true);
+			}		
+				
 		}else {			
 			result = new Page(Path.COMMAND__PROFILE_UPDATE_PAGE + "&error=" + errorMessage, true);
 		}

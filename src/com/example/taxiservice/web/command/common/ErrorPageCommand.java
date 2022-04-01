@@ -1,4 +1,4 @@
-package com.example.taxiservice.web.command;
+package com.example.taxiservice.web.command.common;
 
 import java.io.IOException;
 
@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import com.example.taxiservice.web.Page;
 import com.example.taxiservice.web.Path;
+import com.example.taxiservice.web.command.Command;
 
 public class ErrorPageCommand extends Command {
 	

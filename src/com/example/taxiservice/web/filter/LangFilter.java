@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -21,6 +22,12 @@ import org.slf4j.LoggerFactory;
 public class LangFilter implements Filter {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(LangFilter.class);
+	
+	public void destroy() {
+		LOG.debug("Filter destruction starts");
+		// do nothing
+		LOG.debug("Filter destruction finished");
+	}
 
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
 		
@@ -33,13 +40,21 @@ public class LangFilter implements Filter {
 		String locales = servletContext.getInitParameter("locales");
 		
 		if(locale != null && locales.contains(locale)) {
+			LOG.debug("Request attribute: locale = " + locale);
 			HttpSession session = httpRequest.getSession();
 			Config.set(session, Config.FMT_LOCALE, locale);
 			session.setAttribute("locale", locale);
+			LOG.debug("Set the session attribute: locale --> " + locale);
 		}
 		
 		LOG.debug("Filter finished");
 		chain.doFilter(request, response);
+	}
+	
+	public void init(FilterConfig fConfig) throws ServletException {
+		LOG.debug("Filter initialization starts");
+		// do nothing
+		LOG.debug("Filter initialization finished");		
 	}
 
 }

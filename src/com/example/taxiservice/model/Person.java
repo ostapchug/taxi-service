@@ -57,8 +57,6 @@ public class Person extends Entity {
 	public String toString() {
 		return "Person [phone=" + phone + ", password=" + password + ", name=" + name + ", surname=" + surname
 				+ ", roleId=" + roleId + "]";
-	}
-	
-		
+	}	
 
 }

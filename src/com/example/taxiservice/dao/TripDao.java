@@ -9,7 +9,7 @@ import com.example.taxiservice.model.Trip;
 
 public interface TripDao extends EntityDao<Trip> {
 	
-	void insert(Trip trip, Car... cars);
+	boolean insert(Trip trip, Car... cars);
 	
 	List<Trip> findAll(int offset, int count, String sorting);
 	
@@ -27,7 +27,7 @@ public interface TripDao extends EntityDao<Trip> {
 	
 	Integer getCountByPersonIdAndDate(Long personId, Timestamp [] dateRange);
 	
-	void updateStatus(Trip trip, String status);
+	boolean updateStatus(Trip trip, String status);
 	
 	BigDecimal getTotalBill(Long personId);
 

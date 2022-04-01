@@ -6,8 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.example.taxiservice.dao.CategoryDao;
-import com.example.taxiservice.dao.DBManager;
-import com.example.taxiservice.dao.mysql.MySqlCategoryDao;
 import com.example.taxiservice.model.Category;
 
 
@@ -17,8 +15,8 @@ public class CategoryService {
 	
 	private CategoryDao categoryDao;
 	
-	public CategoryService() {
-		this.categoryDao = new MySqlCategoryDao(DBManager.getInstance());
+	public CategoryService(CategoryDao categoryDao) {
+		this.categoryDao = categoryDao;
 	}
 	
 	public Category find(Long id) {

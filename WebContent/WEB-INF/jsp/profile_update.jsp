@@ -3,7 +3,6 @@
 <!DOCTYPE html>
 <html>
 <c:set var="title" value="Taxi Service | Profile Update"/>
-<c:set var="localePath" value="?command=profile_update_page&locale="/>
 <%@ include file="/WEB-INF/jspf/head.jspf"%>
 <body>
 <%@ include file="/WEB-INF/jspf/navbar.jspf"%>
@@ -90,7 +89,7 @@
 <div class="form-group">
   <div class="col-sm-offset-3 col-sm-8">
     <button type="submit" class="btn btn-primary"><fmt:message key="general.button.anchor.submit"/></button>&nbsp;
-    <a href="?command=profile_page" class="btn btn-danger" role="button"><fmt:message key="general.button.anchor.cancel"/></a>
+    <a href="?command=profile_page" class="btn btn-default" role="button"><fmt:message key="general.button.anchor.back"/></a>
   </div>
 </div>
 

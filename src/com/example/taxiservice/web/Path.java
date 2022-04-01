@@ -17,6 +17,7 @@ public final class Path {
 	public static final String PAGE__PROFILE_UPDATE = "/WEB-INF/jsp/profile_update.jsp";
 	public static final String PAGE__TRIPS = "/WEB-INF/jsp/trips.jsp";
 	public static final String PAGE__TRIP = "/WEB-INF/jsp/trip.jsp";
+	public static final String PAGE__NEW_TRIP = "/WEB-INF/jsp/new_trip.jsp";
 	public static final String PAGE__TRIP_OFFER = "/WEB-INF/jsp/trip_offer.jsp";
 	public static final String PAGE__TRIP_CONFIRM = "/WEB-INF/jsp/trip_confirm.jsp";
 	public static final String PAGE__ERROR = "/WEB-INF/jsp/error.jsp";

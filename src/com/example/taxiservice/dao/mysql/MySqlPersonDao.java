@@ -6,11 +6,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import javax.sql.DataSource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.example.taxiservice.dao.AbstractDao;
-import com.example.taxiservice.dao.DBManager;
 import com.example.taxiservice.dao.Fields;
 import com.example.taxiservice.dao.PersonDao;
 import com.example.taxiservice.model.Person;
@@ -21,14 +22,11 @@ public class MySqlPersonDao extends AbstractDao<Person> implements PersonDao {
 	private static final String SQL__FIND_PERSON_BY_PHONE = "SELECT * FROM person WHERE p_phone=?";
 	private static final String SQL__INSERT_PERSON = "INSERT INTO person (p_phone, p_password, p_name, p_surname) VALUES (?,?,?,?)";
 	private static final String SQL__UPDATE_PERSON = "UPDATE person SET p_phone=?, p_password=?, p_name=?, p_surname=? WHERE p_id = ?";
-	private static final String SQL__DELETE_PERSON = "DELETE FROM person WHERE p_id = ?";
 	
 	private static final Logger LOG = LoggerFactory.getLogger(MySqlPersonDao.class);
 
-
-
-	public MySqlPersonDao(DBManager dbManager) {
-		super(dbManager);
+	public MySqlPersonDao(DataSource dataSource) {
+		super(dataSource);
 	}
 
 	@Override
@@ -93,7 +91,8 @@ public class MySqlPersonDao extends AbstractDao<Person> implements PersonDao {
 	}
 
 	@Override
-	public void insert(Person person) {
+	public boolean insert(Person person) {
+		boolean result = true;
 		Connection connection = null;
 		PreparedStatement statement = null;
 		ResultSet set = null;
@@ -113,18 +112,21 @@ public class MySqlPersonDao extends AbstractDao<Person> implements PersonDao {
 			}
 			
 			commit(connection);
-			
+			result = false;
 		} catch (SQLException e) {
 			rollback(connection);
 			LOG.error(e.getMessage());
 		} finally {
 			close(set, statement, connection);	
-		}	
+		}
+		
+		return result;
 		
 	}
 
 	@Override
-	public void update(Person person) {
+	public boolean update(Person person) {
+		boolean result = false;
 		Connection connection = null;
 		PreparedStatement statement = null;
 		
@@ -139,35 +141,16 @@ public class MySqlPersonDao extends AbstractDao<Person> implements PersonDao {
 			statement.executeUpdate();
 			
 			commit(connection);
+			result = true;
 			
 		}catch (SQLException e) {
 			rollback(connection);
 			LOG.error(e.getMessage());
 		} finally {
 			close(statement, connection);	
-		}	
+		}
 		
-	}
-
-	@Override
-	public void delete(Person person) {
-		Connection connection = null;
-		PreparedStatement statement = null;
-		
-		try {
-			connection = getConnection();
-			statement = connection.prepareStatement(SQL__DELETE_PERSON);
-			statement.setLong(1, person.getId());
-			statement.executeUpdate();
-			
-			commit(connection);
-			
-		}catch (SQLException e) {
-			rollback(connection);
-			LOG.error(e.getMessage());
-		} finally {
-			close(statement, connection);	
-		}	
+		return result;
 		
 	}
 

@@ -11,6 +11,9 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.example.taxiservice.dao.DBManager;
+import com.example.taxiservice.dao.mysql.MySqlCategoryDao;
+import com.example.taxiservice.dao.mysql.MySqlLocationDao;
 import com.example.taxiservice.model.Category;
 import com.example.taxiservice.model.Location;
 import com.example.taxiservice.service.CategoryService;
@@ -31,8 +34,8 @@ public class NewTripPageCommand extends Command {
 		
 		setErrorMessage(request);
 		
-		CategoryService tripService = new CategoryService();
-		LocationService locationService = new LocationService();
+		CategoryService tripService = new CategoryService(new MySqlCategoryDao(DBManager.getDataSource()));
+		LocationService locationService = new LocationService(new MySqlLocationDao(DBManager.getDataSource()));
 		HttpSession session = request.getSession(false);
 		
 		String lang = (String) session.getAttribute("locale");	
@@ -43,7 +46,7 @@ public class NewTripPageCommand extends Command {
 			request.setAttribute("categories", categories);
 			request.setAttribute("locations", locations);
 
-			result = new Page(Path.PAGE__TRIP);
+			result = new Page(Path.PAGE__NEW_TRIP);
 			
 		}else {
 			result = new Page(Path.COMMAND__ERROR_PAGE, true);
@@ -71,8 +74,8 @@ public class NewTripPageCommand extends Command {
 				case "car":
 					request.setAttribute("errorMessage", "error.label.anchor.car");			
 					break;
-				case "trip":
-					request.setAttribute("errorMessage", "error.label.anchor.trip");			
+				case "trip_create":
+					request.setAttribute("errorMessage", "error.label.anchor.trip_create");			
 					break;
 				default:
 					break;

@@ -12,6 +12,8 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.example.taxiservice.dao.DBManager;
+import com.example.taxiservice.dao.mysql.MySqlPersonDao;
 import com.example.taxiservice.service.PersonService;
 import com.example.taxiservice.web.Page;
 import com.example.taxiservice.web.Path;
@@ -42,7 +44,7 @@ public class FilterTripsCommand extends Command {
 		
 	private Page doPost(HttpServletRequest request, HttpServletResponse response) {
 		Page result = null;
-		boolean error = false;
+		String errorMessage = null;
 		
 		HttpSession session = request.getSession(false);
 		String dateRange = request.getParameter("dateFilter");
@@ -53,7 +55,7 @@ public class FilterTripsCommand extends Command {
 					new SimpleDateFormat("dd.MM.yyyy - dd.MM.yyyy").parse(dateRange);
 					session.setAttribute("dateRange", dateRange);
 				} catch (ParseException e) {
-					error = true;
+					errorMessage = "filter_format";
 					LOG.debug(e.getMessage());
 				}
 		}else {
@@ -61,19 +63,19 @@ public class FilterTripsCommand extends Command {
 		}
 		
 		if(phone != null && !phone.isEmpty()) {
-			PersonService personService = new PersonService();
+			PersonService personService = new PersonService(new MySqlPersonDao(DBManager.getDataSource()));
 			
 			if(personService.validatePhone(phone)) {
 				session.setAttribute("phone", phone);
 			}else {
-				error = true;
+				errorMessage = "filter_format";
 			}	
 		}else {
 			session.setAttribute("phone", null);
 		}
 		
-		if(error) {
-			result = new Page(Path.COMMAND__TRIPS_PAGE + "&error=true", true);
+		if(errorMessage != null) {
+			result = new Page(Path.COMMAND__TRIPS_PAGE + "&error=" + errorMessage, true);
 		}else {
 			result = new Page(Path.COMMAND__TRIPS_PAGE, true);
 		}

@@ -8,9 +8,7 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.example.taxiservice.dao.DBManager;
 import com.example.taxiservice.dao.PersonDao;
-import com.example.taxiservice.dao.mysql.MySqlPersonDao;
 import com.example.taxiservice.model.Person;
 
 public class PersonService {
@@ -22,8 +20,8 @@ public class PersonService {
 	
 	private PersonDao personDao;
 
-	public PersonService() {
-		this.personDao = new MySqlPersonDao(DBManager.getInstance());
+	public PersonService(PersonDao personDao) {
+		this.personDao = personDao;
 	}
 	
 	public Person find(String phone) {
@@ -34,24 +32,23 @@ public class PersonService {
 		return personDao.find(id);
 	}
 	
-	public void insert(Person person) {
-		personDao.insert(person);
+	public boolean insert(Person person) {
+		return personDao.insert(person);
 	}
 	
-	public void update(Person person) {
-		Person oldPerson = personDao.find(person.getId());
+	public boolean update(Person person) {
+		boolean result = false;
 		
 		if(person.getPassword().isEmpty()) {
+			Person oldPerson = personDao.find(person.getId());
 			person.setPassword(oldPerson.getPassword());
-			personDao.update(person);
+			result = personDao.update(person);
 		}else {
-			personDao.update(person);
+			result = personDao.update(person);
 		}
 		
-	}
-	
-	public void delete(Person person) {
-		personDao.delete(person);
+		return result;
+		
 	}
 	
 	public boolean validateText(String text) {
