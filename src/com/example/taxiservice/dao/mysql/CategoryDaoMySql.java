@@ -8,17 +8,20 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.sql.DataSource;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.example.taxiservice.dao.AbstractDao;
 import com.example.taxiservice.dao.CategoryDao;
 import com.example.taxiservice.dao.Fields;
+import com.example.taxiservice.factory.annotation.Singleton;
 import com.example.taxiservice.model.Category;
 
-public class MySqlCategoryDao extends AbstractDao<Category> implements CategoryDao{
+/**
+ * Data access object for Category entity.
+ */
+@Singleton
+public class CategoryDaoMySql extends AbstractDao<Category> implements CategoryDao{
 	
 	private static final String SQL__FIND_CATEGORY_BY_ID = "SELECT * FROM car_category WHERE cc_id=?";
 	private static final String SQL__INSERT_CATEGORY = "INSERT INTO car_category (cc_name, cc_price) VALUES (?,?)";
@@ -31,10 +34,10 @@ public class MySqlCategoryDao extends AbstractDao<Category> implements CategoryD
 																	 "INNER JOIN car_category_translation ON cc_id = cct_car_category " +
 																	 "INNER JOIN language ON cct_lang = lang_id WHERE lang_name = ?";
 	
-	private static final Logger LOG = LoggerFactory.getLogger(MySqlCategoryDao.class);
+	private static final Logger LOG = LoggerFactory.getLogger(CategoryDaoMySql.class);
 
-	public MySqlCategoryDao(DataSource dataSource) {
-		super(dataSource);
+	public CategoryDaoMySql() {
+		LOG.info("MySqlCategoryDao initialized");
 	}
 
 	@Override

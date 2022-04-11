@@ -10,8 +10,7 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.example.taxiservice.dao.DBManager;
-import com.example.taxiservice.dao.mysql.MySqlTripDao;
+import com.example.taxiservice.factory.annotation.InjectByType;
 import com.example.taxiservice.model.Trip;
 import com.example.taxiservice.model.dto.TripConfirmDto;
 import com.example.taxiservice.service.TripService;
@@ -19,10 +18,20 @@ import com.example.taxiservice.web.Page;
 import com.example.taxiservice.web.Path;
 import com.example.taxiservice.web.command.Command;
 
+/**
+ * Trip confirm command.
+ */
 public class TripConfirmCommand extends Command {
 	
 	private static final long serialVersionUID = -6632486558571801735L;
 	private static final Logger LOG = LoggerFactory.getLogger(TripConfirmCommand.class);
+	
+	@InjectByType
+	private TripService tripService;
+	
+	public TripConfirmCommand() {
+		LOG.info("TripConfirmCommand initialized");
+	}
 
 	@Override
 	public Page execute(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -39,6 +48,11 @@ public class TripConfirmCommand extends Command {
 		return result;
 	}
 	
+	/**
+	 * Creates new trip from session data and store it in the DB. As first page displays a trips page.
+	 *
+	 * @return Page object which contain path to the view of trips page.
+	 */		
 	private Page doPost(HttpServletRequest request, HttpServletResponse response) {
 		Page result = null;
 		
@@ -47,6 +61,7 @@ public class TripConfirmCommand extends Command {
 		long personId = (long) session.getAttribute("personId");
 		session.removeAttribute("tripConfirm");
 		
+		// obtain confirmation from the request
 		String confirm  = request.getParameter("confirm");
 			
 		if(tripConfirm != null && "confirmed".equals(confirm)) {
@@ -57,7 +72,6 @@ public class TripConfirmCommand extends Command {
 			trip.setDistance(tripConfirm.getDistance());
 			trip.setBill(tripConfirm.getTotal());
 			
-			TripService tripService = new TripService(new MySqlTripDao(DBManager.getDataSource()));
 			boolean inserted = tripService.insert(trip, tripConfirm.getCars());
 			
 			if(inserted) {

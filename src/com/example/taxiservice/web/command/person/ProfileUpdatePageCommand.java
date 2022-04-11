@@ -13,19 +13,27 @@ import com.example.taxiservice.web.Page;
 import com.example.taxiservice.web.Path;
 import com.example.taxiservice.web.command.Command;
 
+/**
+ * Profile update page command.
+ */
 public class ProfileUpdatePageCommand extends Command {
 
 	private static final long serialVersionUID = 4207767322581464759L;
-	
 	private static final Logger LOG = LoggerFactory.getLogger(ProfileUpdatePageCommand.class);
 	
+	public ProfileUpdatePageCommand() {
+		LOG.info("ProfileUpdatePageCommand initialized");
+	}
 
 	@Override
 	public Page execute(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 		
 		LOG.debug("Command start");
+		
+		// obtain error message from the request
 		String errorMessage = request.getParameter("error");
 		
+		// handle error message from the request, if not null set appropriate attribute
 		if(errorMessage != null) {
 			switch (errorMessage) {
 				case "phone_format":
@@ -49,7 +57,6 @@ public class ProfileUpdatePageCommand extends Command {
 				case "profile_update":
 					request.setAttribute("errorMessage", "error.label.anchor.profile_update");
 					break;
-	
 				default:
 					break;
 				}
@@ -57,8 +64,6 @@ public class ProfileUpdatePageCommand extends Command {
 		
 		LOG.debug("Command finish");
 		return new Page(Path.PAGE__PROFILE_UPDATE);
-	}
-	
-	
+	}	
 
 }

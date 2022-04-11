@@ -9,8 +9,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.example.taxiservice.dao.PersonDao;
+import com.example.taxiservice.factory.annotation.InjectByType;
+import com.example.taxiservice.factory.annotation.Singleton;
 import com.example.taxiservice.model.Person;
 
+/**
+ * Service layer for Person DAO object.
+ */
+@Singleton
 public class PersonService {
 	
 	private static final String PHONE_PATTERN = "[0-9]{10}";
@@ -18,11 +24,12 @@ public class PersonService {
 	private static final String PASSWORD_PATTERN = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$";
 	private static final Logger LOG = LoggerFactory.getLogger(PersonService.class);
 	
+	@InjectByType
 	private PersonDao personDao;
-
-	public PersonService(PersonDao personDao) {
-		this.personDao = personDao;
-	}
+	
+	public PersonService() {
+		LOG.info("PersonService initialized");
+	}	
 	
 	public Person find(String phone) {
 		return personDao.find(phone);
@@ -51,20 +58,22 @@ public class PersonService {
 		
 	}
 	
-	public boolean validateText(String text) {
+	public static boolean validateText(String text) {
 		boolean result = false;
 		
-		Pattern pattern = Pattern.compile(TEXT_PATTERN);
-		Matcher matcher = pattern.matcher(text);
-		
-		if(matcher.matches()) {
-			result = true;
+		if(text != null) {
+			Pattern pattern = Pattern.compile(TEXT_PATTERN);
+			Matcher matcher = pattern.matcher(text);
+			
+			if(matcher.matches()) {
+				result = true;
+			}
 		}
 		
 		return result;
 	}
 	
-	public boolean validatePhone(String phone) {
+	public static boolean validatePhone(String phone) {
 		boolean result = false;
 		
 		if(phone != null) {
@@ -79,7 +88,7 @@ public class PersonService {
 		return result;	
 	}
 	
-	public boolean validatePassword(String password) {
+	public static boolean validatePassword(String password) {
 		boolean result = false;
 
 		if(password != null) {
@@ -95,17 +104,17 @@ public class PersonService {
 		return result;
 	}
 	
-	public boolean validatePassword(String password, String passwordConfirm) {
+	public static boolean validatePasswordConfirm(String password, String passwordConfirm) {
 		boolean result = false;
 
-		if(password.equals(passwordConfirm)) {
+		if(password != null && password.equals(passwordConfirm)) {
 			result = true;
 		}
 		
 		return result;	
 	}
 	
-	public String hashPassword(String password) {
+	public static String hashPassword(String password) {
 		String result = null;
 		
 		if(password != null) {

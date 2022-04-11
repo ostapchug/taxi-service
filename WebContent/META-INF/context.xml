@@ -34,8 +34,8 @@
   			defaultAutoCommit="false"
 			defaultTransactionIsolation="READ_COMMITTED"
             username="root" 
-            password="Rn805Fop12" 
-            driverClassName="com.mysql.jdbc.Driver"
+            password="Rn805Fop12"
+            driverClassName="com.mysql.cj.jdbc.Driver"
             url="jdbc:mysql://localhost:3306/taxi_service"/>
 
 </Context>

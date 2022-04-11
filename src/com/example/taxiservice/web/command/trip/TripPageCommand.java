@@ -11,11 +11,7 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.example.taxiservice.dao.DBManager;
-import com.example.taxiservice.dao.mysql.MySqlCarDao;
-import com.example.taxiservice.dao.mysql.MySqlLocationDao;
-import com.example.taxiservice.dao.mysql.MySqlPersonDao;
-import com.example.taxiservice.dao.mysql.MySqlTripDao;
+import com.example.taxiservice.factory.annotation.InjectByType;
 import com.example.taxiservice.model.Car;
 import com.example.taxiservice.model.Role;
 import com.example.taxiservice.model.Trip;
@@ -29,10 +25,29 @@ import com.example.taxiservice.web.Page;
 import com.example.taxiservice.web.Path;
 import com.example.taxiservice.web.command.Command;
 
+/**
+ * Trip page command.
+ */
 public class TripPageCommand extends Command {
 
 	private static final long serialVersionUID = -4793599624749188289L;
 	private static final Logger LOG = LoggerFactory.getLogger(TripPageCommand.class);
+	
+	@InjectByType
+	private CarService carService;
+	
+	@InjectByType
+	private LocationService locationService;
+	
+	@InjectByType
+	private PersonService personService;
+	
+	@InjectByType
+	private TripService tripService;
+
+	public TripPageCommand() {
+		LOG.info("TripPageCommand initialized");
+	}
 
 	@Override
 	public Page execute(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -40,16 +55,19 @@ public class TripPageCommand extends Command {
 		
 		Page result = null;
 		HttpSession session = request.getSession(false);
+		
+		// obtain required data from session
 		String role = (String) session.getAttribute("personRole");
 		String lang = (String) session.getAttribute("locale");
 		long personId = (long) session.getAttribute("personId");
 		long tripId;
 		Trip trip = null;
 		String errorMessage = null;
-		TripService tripService = new TripService(new MySqlTripDao(DBManager.getDataSource()));
 		
+		// obtain trip id from the request
 		String id = request.getParameter("trip");
 		
+		// validate trip id
 		try {
 			tripId = Long.parseLong(id);
 			trip = tripService.find(tripId);
@@ -57,27 +75,29 @@ public class TripPageCommand extends Command {
 			errorMessage = "trip_not_found";	
 		}
 		
+		// if no errors found proceed
 		if(errorMessage == null && trip != null) {
-			CarService carService = new CarService(new MySqlCarDao(DBManager.getDataSource()));
 			List<Car> cars = carService.findCarsByTripId(trip.getId());
 			
+			// if role equals admin then load trip
 			if(Role.ADMIN.getName().equals(role)) {
 				TripDto tripDto = getTripDto(trip, cars, lang);
 				request.setAttribute("trip", tripDto);
 				result = new Page(Path.PAGE__TRIP);
 			}else {
-				
+				// load trip if trip belongs to person
 				if(trip.getPersonId().equals(personId)) {
 					TripDto tripDto = getTripDto(trip, cars, lang);
 					request.setAttribute("trip", tripDto);
 					result = new Page(Path.PAGE__TRIP);
 				}else {
-					result = new Page(Path.COMMAND__TRIPS_PAGE, true);
+					errorMessage = "access_denied";
+					result = new Page(Path.COMMAND__ERROR_PAGE + "&error=" + errorMessage, true);
 				}
 			}
 			
 		}else {
-			result = new Page(Path.COMMAND__TRIPS_PAGE, true);
+			result = new Page(Path.COMMAND__ERROR_PAGE + "&error=" + errorMessage, true);
 		}
 		
 		LOG.debug("Command finish");
@@ -86,8 +106,6 @@ public class TripPageCommand extends Command {
 	
 	private TripDto getTripDto(Trip trip, List<Car> cars, String lang) {
 		TripDto result = new TripDto();
-		LocationService locationService = new LocationService(new MySqlLocationDao(DBManager.getDataSource()));
-		PersonService personService = new PersonService(new MySqlPersonDao(DBManager.getDataSource()));
 		
 		String origin = locationService.find(trip.getOriginId(), lang).toString();
 		String destination = locationService.find(trip.getDestinationId(), lang).toString();

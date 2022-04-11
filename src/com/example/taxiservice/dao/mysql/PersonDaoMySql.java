@@ -6,27 +6,30 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import javax.sql.DataSource;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.example.taxiservice.dao.AbstractDao;
 import com.example.taxiservice.dao.Fields;
 import com.example.taxiservice.dao.PersonDao;
+import com.example.taxiservice.factory.annotation.Singleton;
 import com.example.taxiservice.model.Person;
 
-public class MySqlPersonDao extends AbstractDao<Person> implements PersonDao {
+/**
+ * Data access object for Person entity.
+ */
+@Singleton
+public class PersonDaoMySql extends AbstractDao<Person> implements PersonDao {
 	
 	private static final String SQL__FIND_PERSON_BY_ID = "SELECT * FROM person WHERE p_id=?";
 	private static final String SQL__FIND_PERSON_BY_PHONE = "SELECT * FROM person WHERE p_phone=?";
 	private static final String SQL__INSERT_PERSON = "INSERT INTO person (p_phone, p_password, p_name, p_surname) VALUES (?,?,?,?)";
 	private static final String SQL__UPDATE_PERSON = "UPDATE person SET p_phone=?, p_password=?, p_name=?, p_surname=? WHERE p_id = ?";
 	
-	private static final Logger LOG = LoggerFactory.getLogger(MySqlPersonDao.class);
-
-	public MySqlPersonDao(DataSource dataSource) {
-		super(dataSource);
+	private static final Logger LOG = LoggerFactory.getLogger(PersonDaoMySql.class);
+	
+	public PersonDaoMySql() {
+		LOG.info("MySqlPersonDao initialized");
 	}
 
 	@Override

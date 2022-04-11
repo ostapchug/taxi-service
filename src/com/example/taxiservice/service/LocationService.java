@@ -7,15 +7,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.example.taxiservice.dao.LocationDao;
+import com.example.taxiservice.factory.annotation.InjectByType;
+import com.example.taxiservice.factory.annotation.Singleton;
 import com.example.taxiservice.model.Location;
 
+/**
+ * Service layer for Location DAO object.
+ */
+@Singleton
 public class LocationService {
+	
 	private static final Logger LOG = LoggerFactory.getLogger(LocationService.class);
 	
+	@InjectByType
 	private LocationDao locationDao;
 
-	public LocationService(LocationDao locationDao) {
-		this.locationDao = locationDao;
+	public LocationService() {
+		LOG.info("LocationService initialized");
 	}
 	
 	public Location find(Long id) {

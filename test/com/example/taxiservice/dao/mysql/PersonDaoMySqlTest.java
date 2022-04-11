@@ -1,4 +1,4 @@
-package test.com.example.taxiservice.dao.mysql;
+package com.example.taxiservice.dao.mysql;
 
 import static org.mockito.Mockito.when;
 import static org.junit.Assert.assertEquals;
@@ -23,12 +23,12 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import com.example.taxiservice.dao.Fields;
-import com.example.taxiservice.dao.mysql.MySqlPersonDao;
+import com.example.taxiservice.dao.mysql.PersonDaoMySql;
 import com.example.taxiservice.model.Person;
 
 @RunWith(MockitoJUnitRunner.class)
-public class TestMySqlPersonDao {
-	
+public class PersonDaoMySqlTest {
+
 	@Mock
 	private DataSource dataSource;
 	@Mock
@@ -39,7 +39,7 @@ public class TestMySqlPersonDao {
 	private ResultSet set;
 	
 	@InjectMocks
-	private MySqlPersonDao personDao;
+	private PersonDaoMySql personDao;
 	
 	private Person person;
 

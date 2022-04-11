@@ -6,6 +6,13 @@
 	
 	<display-name>taxi-service</display-name>
 	
+	<resource-ref>
+		<description>MySQL Datasource</description>
+		<res-ref-name>jdbc/taxi-service-db</res-ref-name>
+		<res-type>javax.sql.DataSource</res-type>
+		<res-auth>Container</res-auth>
+  	</resource-ref>
+	
 	<!--============================================================ 
 	Custom function
 	============================================================= -->
@@ -49,6 +56,33 @@
 	<context-param>
 		<param-name>locales</param-name>
 		<param-value>en uk</param-value>
+	</context-param>
+	
+	<!-- supported commands -->
+	<context-param>
+		<param-name>commands</param-name>
+		<param-value>
+		home_page=com.example.taxiservice.web.command.common.HomePageCommand 
+		error_page=com.example.taxiservice.web.command.common.ErrorPageCommand 
+		sign_in_page=com.example.taxiservice.web.command.person.SignInPageCommand 
+		sign_in=com.example.taxiservice.web.command.person.SignInCommand 
+		sign_up_page=com.example.taxiservice.web.command.person.SignUpPageCommand 
+		sign_up=com.example.taxiservice.web.command.person.SignUpCommand 
+		sign_out=com.example.taxiservice.web.command.person.SignOutCommand 
+		profile_page=com.example.taxiservice.web.command.person.ProfilePageCommand 
+		profile_update_page=com.example.taxiservice.web.command.person.ProfileUpdatePageCommand 
+		profile_update=com.example.taxiservice.web.command.person.ProfileUpdateCommand 
+		new_trip_page=com.example.taxiservice.web.command.trip.NewTripPageCommand 
+		new_trip=com.example.taxiservice.web.command.trip.NewTripCommand 
+		trip_offer_page=com.example.taxiservice.web.command.trip.TripOfferPageCommand 
+		trip_offer=com.example.taxiservice.web.command.trip.TripOfferCommand 
+		trips_page=com.example.taxiservice.web.command.trip.TripsPageCommand 
+		trip_page=com.example.taxiservice.web.command.trip.TripPageCommand 
+		trip_confirm_page=com.example.taxiservice.web.command.trip.TripConfirmPageCommand 
+		trip_confirm=com.example.taxiservice.web.command.trip.TripConfirmCommand 
+		filter_trips=com.example.taxiservice.web.command.trip.FilterTripsCommand 
+		trip_status=com.example.taxiservice.web.command.trip.TripStatusCommand
+		</param-value>
 	</context-param>
 
 	<!--============================================================

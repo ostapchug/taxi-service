@@ -13,10 +13,17 @@ import com.example.taxiservice.web.Page;
 import com.example.taxiservice.web.Path;
 import com.example.taxiservice.web.command.Command;
 
+/**
+ * Home page command.
+ */
 public class HomePageCommand extends Command{
 
 	private static final long serialVersionUID = -9130781253259901563L;
-	private static final Logger LOG = LoggerFactory.getLogger(HomePageCommand.class);
+	private static final Logger LOG = LoggerFactory.getLogger(HomePageCommand.class);		
+
+	public HomePageCommand() {
+		LOG.info("HomePageCommand initialized");
+	}
 
 	@Override
 	public Page execute(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -25,6 +32,5 @@ public class HomePageCommand extends Command{
 		LOG.debug("Command finish");
 		return new Page(Path.PAGE__HOME_PAGE);
 	}
-	
 
 }

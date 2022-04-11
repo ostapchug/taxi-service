@@ -10,8 +10,7 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.example.taxiservice.dao.DBManager;
-import com.example.taxiservice.dao.mysql.MySqlPersonDao;
+import com.example.taxiservice.factory.annotation.InjectByType;
 import com.example.taxiservice.model.Person;
 import com.example.taxiservice.model.Role;
 import com.example.taxiservice.service.PersonService;
@@ -19,10 +18,20 @@ import com.example.taxiservice.web.Page;
 import com.example.taxiservice.web.Path;
 import com.example.taxiservice.web.command.Command;
 
+/**
+ * Sign in command.
+ */
 public class SignInCommand extends Command {
 
 	private static final long serialVersionUID = -4092142808306722870L;
 	private static final Logger LOG = LoggerFactory.getLogger(SignInCommand.class);
+	
+	@InjectByType
+	private PersonService personService;
+	
+	public SignInCommand() {
+		LOG.info("SignInCommand initialized");
+	}
 
 	@Override
 	public Page execute(HttpServletRequest request, HttpServletResponse response)	throws IOException, ServletException {
@@ -40,18 +49,24 @@ public class SignInCommand extends Command {
 		return result;
 	}
 	
+	/**
+	 * Logins user in system. As first page displays a home page.
+	 *
+	 * @return Page object which contain path to the view of home page.
+	 */
 	private Page doPost(HttpServletRequest request, HttpServletResponse response) {
 		
 		Page result = null;
 		String errorMessage = null;
 		
+		// obtain login and password from the request
 		String phone = request.getParameter("phone");
 		String password = request.getParameter("password");
 		
-		PersonService personService = new PersonService(new MySqlPersonDao(DBManager.getDataSource()));
 		Person person = personService.find(phone);
-		password = personService.hashPassword(password);
+		password = PersonService.hashPassword(password);
 		
+		// validate login and password from the request
 		if(person == null) {
 			errorMessage = "phone";
 		}else if(errorMessage == null && password != null && !password.equals(person.getPassword())){
@@ -80,12 +95,11 @@ public class SignInCommand extends Command {
 			
 			result = new Page(Path.COMMAND__HOME_PAGE, true);
 			
-		}else {		
+		}else {
 			result = new Page(Path.COMMAND__SIGN_IN_PAGE + "&error=" + errorMessage, true);
 		}
 		
 		return result;
-		
 	}
 
 }

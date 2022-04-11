@@ -10,22 +10,26 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.sql.DataSource;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.example.taxiservice.dao.AbstractDao;
 import com.example.taxiservice.dao.Fields;
 import com.example.taxiservice.dao.TripDao;
+import com.example.taxiservice.factory.annotation.Singleton;
 import com.example.taxiservice.model.Car;
 import com.example.taxiservice.model.Trip;
 
-public class MySqlTripDao extends AbstractDao<Trip> implements TripDao{
+/**
+ * Data access object for Trip entity.
+ */
+@Singleton
+public class TripDaoMySql extends AbstractDao<Trip> implements TripDao{
 	
 	private static final String SQL__FIND_TRIP_BY_ID = "SELECT * FROM trip WHERE t_id=?";
 	private static final String SQL__INSERT_TRIP = "INSERT INTO trip (t_person, t_origin, t_destination, t_distance, t_bill) VALUES (?, ?, ?, ?, ?)";
 	private static final String SQL__INSERT_TRIP_CAR = "INSERT INTO m2m_trip_car (t_id, c_id) VALUES (?, ?)";
+	private static final String SQL__UPDATE_TRIP = "UPDATE trip SET t_person = ?, t_origin = ?, t_destination = ?, t_distance = ?, t_bill = ? WHERE l_id = ?";
 	private static final String SQL__SELECT_ALL_TRIPS = "SELECT * FROM trip ORDER BY %s LIMIT ?, ?";
 	private static final String SQL__SELECT_ALL_TRIPS_BY_DATE = "SELECT * FROM trip WHERE t_date BETWEEN ? AND ? ORDER BY %s LIMIT ?, ?";
 	private static final String SQL__SELECT_COUNT_TRIPS = "SELECT COUNT(*) FROM trip";
@@ -37,10 +41,10 @@ public class MySqlTripDao extends AbstractDao<Trip> implements TripDao{
 	private static final String SQL__UPDATE_TRIP_STATUS = "UPDATE trip SET t_status=(SELECT ts_id FROM trip_status WHERE ts_name=?) WHERE t_id = ?";
 	private static final String SQL__SELECT_TRIP_TOTAL_BILL = "SELECT SUM(t_bill) FROM trip WHERE t_person = ? AND t_status = 2";
 	
-	private static final Logger LOG = LoggerFactory.getLogger(MySqlTripDao.class);
+	private static final Logger LOG = LoggerFactory.getLogger(TripDaoMySql.class);
 
-	public MySqlTripDao(DataSource dataSource) {
-		super(dataSource);
+	public TripDaoMySql() {
+		LOG.info("MySqlTripDao initialized");
 	}
 
 	@Override
@@ -154,31 +158,33 @@ public class MySqlTripDao extends AbstractDao<Trip> implements TripDao{
 	}
 	
 	@Override
-	public boolean update(Trip entity) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	protected Trip mapRow(ResultSet set) {
-		Trip trip = null;
+	public boolean update(Trip trip) {
+		boolean result = false;
+		Connection connection = null;
+		PreparedStatement statement = null;
 		
 		try {
-			trip = new Trip();
+			connection = getConnection();
+			statement = connection.prepareStatement(SQL__UPDATE_TRIP);
+			statement.setLong(1, trip.getPersonId());
+			statement.setLong(2, trip.getOriginId());
+			statement.setLong(4, trip.getDestinationId());
+			statement.setBigDecimal(5, trip.getDistance());
+			statement.setBigDecimal(6, trip.getBill());
+			statement.setInt(7, trip.getStatusId());
+			statement.executeUpdate();
 			
-			trip.setId(set.getLong(Fields.TRIP__ID));
-			trip.setPersonId(set.getLong(Fields.TRIP__PERSON_ID));
-			trip.setOriginId(set.getLong(Fields.TRIP__ORIGIN_ID));
-			trip.setDestinationId(set.getLong(Fields.TRIP__DESTINATION_ID));
-			trip.setDistance(set.getBigDecimal(Fields.TRIP__DISTANCE));
-			trip.setDate(set.getTimestamp(Fields.TRIP__DATE));
-			trip.setBill(set.getBigDecimal(Fields.TRIP__BILL));
-			trip.setStatusId(set.getInt(Fields.TRIP__STATUS_ID));
-            
-        } catch (SQLException e) {
-        	LOG.error(e.getMessage());
-        }
-		return trip;
+			commit(connection);
+			result = true;
+			
+		}catch (SQLException e) {
+			rollback(connection);
+			LOG.error(e.getMessage());
+		} finally {
+			close(statement, connection);	
+		}
+		
+		return result;
 	}
 
 	@Override
@@ -504,6 +510,28 @@ public class MySqlTripDao extends AbstractDao<Trip> implements TripDao{
 		}
 		
 		return result;
+	}
+	
+	@Override
+	protected Trip mapRow(ResultSet set) {
+		Trip trip = null;
+		
+		try {
+			trip = new Trip();
+			
+			trip.setId(set.getLong(Fields.TRIP__ID));
+			trip.setPersonId(set.getLong(Fields.TRIP__PERSON_ID));
+			trip.setOriginId(set.getLong(Fields.TRIP__ORIGIN_ID));
+			trip.setDestinationId(set.getLong(Fields.TRIP__DESTINATION_ID));
+			trip.setDistance(set.getBigDecimal(Fields.TRIP__DISTANCE));
+			trip.setDate(set.getTimestamp(Fields.TRIP__DATE));
+			trip.setBill(set.getBigDecimal(Fields.TRIP__BILL));
+			trip.setStatusId(set.getInt(Fields.TRIP__STATUS_ID));
+            
+        } catch (SQLException e) {
+        	LOG.error(e.getMessage());
+        }
+		return trip;
 	}
 
 }

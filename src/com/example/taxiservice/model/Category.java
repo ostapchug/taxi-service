@@ -2,6 +2,9 @@ package com.example.taxiservice.model;
 
 import java.math.BigDecimal;
 
+/**
+ * Category entity.
+ */
 public class Category extends Entity {
 	
 	private static final long serialVersionUID = 2890878567526106371L;

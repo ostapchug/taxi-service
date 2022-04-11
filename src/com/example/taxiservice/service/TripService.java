@@ -12,17 +12,25 @@ import org.slf4j.LoggerFactory;
 
 import com.example.taxiservice.dao.Fields;
 import com.example.taxiservice.dao.TripDao;
+import com.example.taxiservice.factory.annotation.InjectByType;
+import com.example.taxiservice.factory.annotation.Singleton;
 import com.example.taxiservice.model.Car;
 import com.example.taxiservice.model.Trip;
 
+/**
+ * Service layer for Trip DAO object.
+ */
+
+@Singleton
 public class TripService {
 	private static final Logger LOG = LoggerFactory.getLogger(TripService.class);
 	private static final String SORT_DESC = " DESC"; //leading space is very important
 	
+	@InjectByType
 	private TripDao tripDao;
 
-	public TripService(TripDao tripDao) {
-		this.tripDao = tripDao;
+	public TripService() {
+		LOG.info("TripService initialized");
 	}
 	
 	public Trip find(Long id) {

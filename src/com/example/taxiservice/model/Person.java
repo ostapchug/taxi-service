@@ -1,7 +1,7 @@
 package com.example.taxiservice.model;
 
 /**
- * Data access object for Person entity
+ * Person entity
  */
 public class Person extends Entity {
 

@@ -10,6 +10,8 @@ import javax.sql.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.example.taxiservice.factory.annotation.InjectDataSource;
+
 /**
  * Parent for all DAO objects
  * Declares and implements methods for working with Statements, ResultSets and
@@ -21,10 +23,11 @@ public abstract class AbstractDao<T> implements EntityDao<T>{
 	
 	private static final Logger LOG = LoggerFactory.getLogger(AbstractDao.class);
 	
-	protected final DataSource dataSource;
+	@InjectDataSource
+	protected DataSource dataSource;
 	
-	public AbstractDao(DataSource dataSource) {
-		this.dataSource = dataSource;
+	public AbstractDao() {
+		LOG.info("AbstractDao initialized");
 	}
 
 	/**

@@ -13,17 +13,26 @@ import com.example.taxiservice.web.Page;
 import com.example.taxiservice.web.Path;
 import com.example.taxiservice.web.command.Command;
 
+/**
+ * Sign un page command.
+ */
 public class SignUpPageCommand extends Command {
 	
 	private static final long serialVersionUID = 5964706657242219655L;
-	
 	private static final Logger LOG = LoggerFactory.getLogger(SignUpPageCommand.class);
+	
+	public SignUpPageCommand() {
+		LOG.info("SignUpPageCommand initialized");
+	}
 
 	@Override
 	public Page execute(HttpServletRequest request, HttpServletResponse response)	throws IOException, ServletException {
 		LOG.debug("Command start");
+		
+		// obtain error message from the request
 		String errorMessage = request.getParameter("error");
 		
+		// handle error message from the request, if not null set appropriate attribute
 		if(errorMessage != null) {
 			switch (errorMessage) {
 				case "phone_format":
@@ -47,7 +56,6 @@ public class SignUpPageCommand extends Command {
 				case "profile_create":
 					request.setAttribute("errorMessage", "error.label.anchor.profile_create");
 					break;
-					
 				default:
 					break;
 				}

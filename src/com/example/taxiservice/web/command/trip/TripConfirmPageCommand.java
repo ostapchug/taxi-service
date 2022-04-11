@@ -10,9 +10,7 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.example.taxiservice.dao.DBManager;
-import com.example.taxiservice.dao.mysql.MySqlCategoryDao;
-import com.example.taxiservice.dao.mysql.MySqlLocationDao;
+import com.example.taxiservice.factory.annotation.InjectByType;
 import com.example.taxiservice.model.dto.TripConfirmDto;
 import com.example.taxiservice.service.CategoryService;
 import com.example.taxiservice.service.LocationService;
@@ -20,10 +18,23 @@ import com.example.taxiservice.web.Page;
 import com.example.taxiservice.web.Path;
 import com.example.taxiservice.web.command.Command;
 
+/**
+ * Trip confirm page command.
+ */
 public class TripConfirmPageCommand extends Command {
 	
 	private static final long serialVersionUID = -3427103898352236639L;
 	private static final Logger LOG = LoggerFactory.getLogger(TripConfirmPageCommand.class);
+	
+	@InjectByType
+	private CategoryService categoryService;
+	
+	@InjectByType
+	private LocationService locationService;
+	
+	public TripConfirmPageCommand() {
+		LOG.info("TripConfirmPageCommand initialized");
+	}
 
 	@Override
 	public Page execute(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -35,9 +46,8 @@ public class TripConfirmPageCommand extends Command {
 		String lang = (String) session.getAttribute("locale");
 		
 		if(tripConfirmDto != null) {
-			CategoryService categoryService = new CategoryService(new MySqlCategoryDao(DBManager.getDataSource()));
-			LocationService locationService = new LocationService(new MySqlLocationDao(DBManager.getDataSource()));
 			
+			// load category and location by specified language
 			String category = categoryService.find(tripConfirmDto.getCategoryId(), lang).getName();
 			String origin = locationService.find(tripConfirmDto.getOriginId(), lang).toString();
 			String destination = locationService.find(tripConfirmDto.getDestinationId(), lang).toString();

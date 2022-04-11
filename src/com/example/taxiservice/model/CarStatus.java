@@ -1,5 +1,8 @@
 package com.example.taxiservice.model;
 
+/**
+ * CarStatus entity.
+ */
 public enum CarStatus {
 	READY, BUSY, INACTIVE;
 	

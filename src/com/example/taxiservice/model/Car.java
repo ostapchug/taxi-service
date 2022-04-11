@@ -1,5 +1,8 @@
 package com.example.taxiservice.model;
 
+/**
+ * Car entity.
+ */
 public class Car extends Entity{
 
 	private static final long serialVersionUID = 4963338483931961954L;

@@ -18,7 +18,8 @@ public abstract class Command implements Serializable {
 	
 	/**
 	 * Execution method for command.
-	 * @return Address to go once the command is executed.
+	 * 
+	 * @return Page object which contain address to go once the command is executed.
 	 */
 	public abstract Page execute(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException;
 	

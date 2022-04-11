@@ -12,19 +12,22 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.example.taxiservice.dao.DBManager;
-import com.example.taxiservice.dao.mysql.MySqlPersonDao;
 import com.example.taxiservice.service.PersonService;
 import com.example.taxiservice.web.Page;
 import com.example.taxiservice.web.Path;
 import com.example.taxiservice.web.command.Command;
 
-
+/**
+ * Filter trips command.
+ */
 public class FilterTripsCommand extends Command {
 	
 	private static final long serialVersionUID = -6207169506311667353L;
-	
 	private static final Logger LOG = LoggerFactory.getLogger(FilterTripsCommand.class);
+
+	public FilterTripsCommand() {
+		LOG.info("FilterTripsCommand initialized");
+	}
 
 	@Override
 	public Page execute(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -41,15 +44,23 @@ public class FilterTripsCommand extends Command {
 		return result;
 		
 	}
-		
+	
+	/**
+	 * Sets filter parameter value in the session. As first page displays a trips page.
+	 *
+	 * @return Page object which contain path to the view of trips page.
+	 */			
 	private Page doPost(HttpServletRequest request, HttpServletResponse response) {
 		Page result = null;
 		String errorMessage = null;
 		
 		HttpSession session = request.getSession(false);
+		
+		// obtain filter data from the request
 		String dateRange = request.getParameter("dateFilter");
 		String phone = request.getParameter("phoneFilter");
-
+		
+		// validate filter data from the request and set appropriate session attribute
 		if(dateRange != null && !dateRange.isEmpty()) {				
 				try {
 					new SimpleDateFormat("dd.MM.yyyy - dd.MM.yyyy").parse(dateRange);
@@ -63,9 +74,8 @@ public class FilterTripsCommand extends Command {
 		}
 		
 		if(phone != null && !phone.isEmpty()) {
-			PersonService personService = new PersonService(new MySqlPersonDao(DBManager.getDataSource()));
 			
-			if(personService.validatePhone(phone)) {
+			if(PersonService.validatePhone(phone)) {
 				session.setAttribute("phone", phone);
 			}else {
 				errorMessage = "filter_format";
@@ -74,6 +84,7 @@ public class FilterTripsCommand extends Command {
 			session.setAttribute("phone", null);
 		}
 		
+		// if validation fail set error request parameter
 		if(errorMessage != null) {
 			result = new Page(Path.COMMAND__TRIPS_PAGE + "&error=" + errorMessage, true);
 		}else {

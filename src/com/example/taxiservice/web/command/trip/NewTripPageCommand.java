@@ -11,9 +11,7 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.example.taxiservice.dao.DBManager;
-import com.example.taxiservice.dao.mysql.MySqlCategoryDao;
-import com.example.taxiservice.dao.mysql.MySqlLocationDao;
+import com.example.taxiservice.factory.annotation.InjectByType;
 import com.example.taxiservice.model.Category;
 import com.example.taxiservice.model.Location;
 import com.example.taxiservice.service.CategoryService;
@@ -22,25 +20,39 @@ import com.example.taxiservice.web.Page;
 import com.example.taxiservice.web.Path;
 import com.example.taxiservice.web.command.Command;
 
+/**
+ * New trip page command.
+ */
 public class NewTripPageCommand extends Command {
 	
 	private static final long serialVersionUID = 698775434526628638L;
 	private static final Logger LOG = LoggerFactory.getLogger(NewTripPageCommand.class);
+	
+	@InjectByType
+	private CategoryService tripService;
+	
+	@InjectByType
+	private LocationService locationService;
+	
+	public NewTripPageCommand() {
+		LOG.info("NewTripPageCommand initialized");
+	}
 
 	@Override
 	public Page execute(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 		LOG.debug("Command start");
 		Page result = null;
 		
+		// error handler
 		setErrorMessage(request);
 		
-		CategoryService tripService = new CategoryService(new MySqlCategoryDao(DBManager.getDataSource()));
-		LocationService locationService = new LocationService(new MySqlLocationDao(DBManager.getDataSource()));
 		HttpSession session = request.getSession(false);
 		
-		String lang = (String) session.getAttribute("locale");	
+		String lang = (String) session.getAttribute("locale");
+		
+		// load all categories and locations by specified language
 		List<Category> categories = tripService.findAll(lang);
-		List<Location> locations = locationService.findAll(lang);
+		List<Location> locations = locationService.findAll(lang);	
 		
 		if(categories != null && locations != null) {
 			request.setAttribute("categories", categories);
@@ -58,8 +70,10 @@ public class NewTripPageCommand extends Command {
 	
 	private void setErrorMessage(HttpServletRequest request) {
 		
+		// obtain error message from the request
 		String errorMessage = request.getParameter("error");
 		
+		// handle error message from the request, if not null set appropriate attribute
 		if(errorMessage != null) {
 			switch (errorMessage) {
 				case "capacity":

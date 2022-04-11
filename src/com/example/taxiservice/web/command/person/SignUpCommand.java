@@ -9,18 +9,27 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.example.taxiservice.dao.DBManager;
-import com.example.taxiservice.dao.mysql.MySqlPersonDao;
+import com.example.taxiservice.factory.annotation.InjectByType;
 import com.example.taxiservice.model.Person;
 import com.example.taxiservice.service.PersonService;
 import com.example.taxiservice.web.Page;
 import com.example.taxiservice.web.Path;
 import com.example.taxiservice.web.command.Command;
 
+/**
+ * Sign up command. 
+*/
 public class SignUpCommand extends Command {
 
 	private static final long serialVersionUID = -3445237114266973954L;
 	private static final Logger LOG = LoggerFactory.getLogger(SignUpCommand.class);
+	
+	@InjectByType
+	private PersonService personService;
+	
+	public SignUpCommand() {
+		LOG.info("SignUpCommand initialized");
+	}
 
 	@Override
 	public Page execute(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -37,27 +46,32 @@ public class SignUpCommand extends Command {
 		return result;
 	}
 	
+	/**
+	 * Register person in system. As first page displays a sign in page.
+	 *
+	 * @return Page object which contain path to the view of sign in page.
+	 */	
 	private Page doPost(HttpServletRequest request, HttpServletResponse response) {
 		Page result = null;
 		String errorMessage = null;
 		
+		// obtain person registration data from the request
 		String phone = request.getParameter("phone");
 		String password = request.getParameter("password");
 		String passwordConfirm = request.getParameter("passwordConfirm");
 		String name = request.getParameter("name");
 		String surname = request.getParameter("surname");
 		
-		PersonService personService = new PersonService(new MySqlPersonDao(DBManager.getDataSource()));
-		
-		if(!personService.validatePhone(phone)) {
+		// validate person registration data from the request
+		if(!PersonService.validatePhone(phone)) {
 			errorMessage = "phone_format";
-		}else if(!personService.validatePassword(password)) {
+		}else if(!PersonService.validatePassword(password)) {
 			errorMessage = "password";
-		}else if(!personService.validatePassword(password, passwordConfirm)) {
+		}else if(!PersonService.validatePasswordConfirm(password, passwordConfirm)) {
 			errorMessage = "password_confirm";
-		}else if(!name.isEmpty() && !personService.validateText(name)) {
+		}else if(!name.isEmpty() && !PersonService.validateText(name)) {
 			errorMessage = "name";
-		}else if(!surname.isEmpty() && !personService.validateText(surname)) {
+		}else if(!surname.isEmpty() && !PersonService.validateText(surname)) {
 			errorMessage = "surname";
 		}
 		
@@ -68,8 +82,8 @@ public class SignUpCommand extends Command {
 		}
 		
 		if(errorMessage == null) {
-			personService.hashPassword(password);
-			personService.hashPassword(passwordConfirm);
+			PersonService.hashPassword(password);
+			PersonService.hashPassword(passwordConfirm);
 			Person person = new Person();
 			person.setPhone(phone);
 			person.setPassword(password);

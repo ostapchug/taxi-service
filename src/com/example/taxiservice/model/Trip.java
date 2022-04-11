@@ -3,6 +3,9 @@ package com.example.taxiservice.model;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 
+/**
+ * Trip entity
+ */
 public class Trip extends Entity {
 
 	private static final long serialVersionUID = -4514764917915340920L;

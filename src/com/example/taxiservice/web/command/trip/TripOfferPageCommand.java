@@ -15,10 +15,17 @@ import com.example.taxiservice.web.Page;
 import com.example.taxiservice.web.Path;
 import com.example.taxiservice.web.command.Command;
 
+/**
+ * Trip offer page command.
+ */
 public class TripOfferPageCommand extends Command {
 	
 	private static final long serialVersionUID = -3078249138900404841L;
 	private static final Logger LOG = LoggerFactory.getLogger(TripOfferPageCommand.class);
+	
+	public TripOfferPageCommand() {
+		LOG.info("TripOfferPageCommand initialized");
+	}
 
 	@Override
 	public Page execute(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {

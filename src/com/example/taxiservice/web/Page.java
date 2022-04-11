@@ -1,5 +1,8 @@
 package com.example.taxiservice.web;
 
+/**
+ * Path handler object (for PRG realization)
+ */
 public class Page {
 	private String path;
 	private boolean isRedirect;

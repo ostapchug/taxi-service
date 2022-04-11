@@ -1,5 +1,8 @@
 package com.example.taxiservice.model;
 
+/**
+ * TripStatus entity.
+ */
 public enum TripStatus {
 	NEW, ACCEPTED, COMPLETED, CANCELLED;
 	

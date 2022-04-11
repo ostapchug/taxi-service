@@ -3,7 +3,6 @@ package com.example.taxiservice.web;
 /**
  * Path holder (jsp pages and controller commands)
 */
-
 public final class Path {
 	
 	private Path() {

@@ -2,6 +2,9 @@ package com.example.taxiservice.dao;
 
 import com.example.taxiservice.model.Person;
 
+/**
+ * Interface for Person DAO object
+ */
 public interface PersonDao extends EntityDao<Person> {
 	
 	/**

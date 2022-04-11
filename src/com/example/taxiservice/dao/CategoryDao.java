@@ -4,16 +4,33 @@ import java.util.List;
 
 import com.example.taxiservice.model.Category;
 
+/**
+ * Interface for Category DAO object
+ */
 public interface CategoryDao extends EntityDao<Category> {
 	
+	/**
+	 * Finds category in DB by specified id and language
+	 *
+	 * @param id - category id.
+	 * 
+	 * @param lang - language.
+	 * 
+	 * @return Category entity with given parameters.
+	 */
 	Category find(Long id, String lang);
 	
 	/**
-	 * Finds all objects of type <code>Category</code> in DB
+	 * Finds all categories in DB
 	 *
-	 * @return all objects that DB has at this point
+	 * @return List of category entities.
 	 */
 	List<Category> findAll();
 	
+	/**
+	 * Finds all categories in DB by specified language
+	 *
+	 * @return List of category entities.
+	 */	
 	List<Category> findAll(String lang);
 }

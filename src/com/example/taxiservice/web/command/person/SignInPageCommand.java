@@ -13,18 +13,27 @@ import com.example.taxiservice.web.Page;
 import com.example.taxiservice.web.Path;
 import com.example.taxiservice.web.command.Command;
 
+/**
+ * Sign in page command.
+ */
 public class SignInPageCommand extends Command {
 	
 	private static final long serialVersionUID = -4092142808306722870L;
-	
 	private static final Logger LOG = LoggerFactory.getLogger(SignInPageCommand.class);
+	
+	public SignInPageCommand() {
+		LOG.info("SignInPageCommand initialized");
+	}
 
 	@Override
 	public Page execute(HttpServletRequest request, HttpServletResponse response)	throws IOException, ServletException {
 		
 		LOG.debug("Command start");
+		
+		// obtain error message from the request
 		String errorMessage = request.getParameter("error");
 		
+		// handle error message from the request, if not null set appropriate attribute
 		if(errorMessage != null) {
 			switch (errorMessage) {
 				case "phone":
@@ -33,7 +42,6 @@ public class SignInPageCommand extends Command {
 				case "password":
 					request.setAttribute("errorPassword", "error.label.anchor.wrong_password");
 					break;
-	
 				default:
 					break;
 				}

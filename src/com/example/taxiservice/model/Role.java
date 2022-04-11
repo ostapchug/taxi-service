@@ -2,7 +2,6 @@ package com.example.taxiservice.model;
 
 /**
  * Role entity.
- * 
  */
 public enum Role {
 	ADMIN, CLIENT;

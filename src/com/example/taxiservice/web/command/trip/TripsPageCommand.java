@@ -12,10 +12,7 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.example.taxiservice.dao.DBManager;
-import com.example.taxiservice.dao.mysql.MySqlLocationDao;
-import com.example.taxiservice.dao.mysql.MySqlPersonDao;
-import com.example.taxiservice.dao.mysql.MySqlTripDao;
+import com.example.taxiservice.factory.annotation.InjectByType;
 import com.example.taxiservice.model.Person;
 import com.example.taxiservice.model.Role;
 import com.example.taxiservice.model.Trip;
@@ -28,11 +25,27 @@ import com.example.taxiservice.web.Page;
 import com.example.taxiservice.web.Path;
 import com.example.taxiservice.web.command.Command;
 
+/**
+ * Trips page command.
+ */
 public class TripsPageCommand extends Command {
 
 	private static final long serialVersionUID = -4416385983983844193L;
 	private static final Logger LOG = LoggerFactory.getLogger(TripsPageCommand.class);
-	private static final int COUNT = 5;
+	private static final int COUNT = 5; // trips per page
+	
+	@InjectByType
+	private LocationService locationService;
+	
+	@InjectByType
+	private PersonService personService;
+	
+	@InjectByType
+	private TripService tripService;
+	
+	public TripsPageCommand() {
+		LOG.info("TripsPageCommand initialized");
+	}
 
 	@Override
 	public Page execute(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -41,12 +54,18 @@ public class TripsPageCommand extends Command {
 		List<Trip> trips = null;
 		List<TripDto> tripDtoList = null;
 		HttpSession session = request.getSession(false);
+		
+		// error handler
 		setErrorMessage(request);
-			
+		
+		// obtain sorting and page parameters from the request
 		String sort = request.getParameter("sort");
 		String page = request.getParameter("page");
+		
+		// store sorting parameter in session 
 		setSorting(session, sort);
 		
+		// obtain required data from session
 		String lang = (String) session.getAttribute("locale");
 		String role = (String) session.getAttribute("personRole");
 		String phone = (String) session.getAttribute("phone");
@@ -54,9 +73,10 @@ public class TripsPageCommand extends Command {
 		
 		String sorting = (String) session.getAttribute("sorting");
 		String dateRange = (String) session.getAttribute("dateRange");
-		PersonService personService = new PersonService(new MySqlPersonDao(DBManager.getDataSource()));
-				
+		
+		// if role equals admin then load all trips
 		if(Role.ADMIN.getName().equals(role)) {
+			// filter trips by client
 			if(phone != null) {
 				Person person = personService.find(phone);
 				Long id = person != null ? person.getId() : -1;
@@ -66,6 +86,7 @@ public class TripsPageCommand extends Command {
 			}
 			
 		}else {
+			// load trips if they belong to person
 			trips = getTripsByPerson(session, personId, dateRange, page, sorting);
 		}
 		
@@ -76,21 +97,40 @@ public class TripsPageCommand extends Command {
 		return new Page(Path.PAGE__TRIPS);
 	}
 	
+	/**
+	 * Finds all trips in DB by specified dateRange, sets required session attributes.
+	 * 
+	 * @param session - current session.
+	 * 
+	 * @param dateRange - filtering condition.
+	 * 
+	 * @param page - page number.
+	 * 
+	 * @param sorting - sorting method.
+	 * 
+	 * @return List of trips.
+	 */		
 	private List<Trip> getTrips(HttpSession session, String dateRange, String page, String sorting){
 		List<Trip> trips = null;
-		TripService tripService = new TripService(new MySqlTripDao(DBManager.getDataSource()));
 		
+		// calculate page count by specified dateRange or without it
 		int pageCount = (dateRange == null) ? tripService.getPages(COUNT) : tripService.getPages(dateRange, COUNT);
+		
+		// set page count as session attribute
 		session.setAttribute("totalPages", pageCount);
+		
+		// set page as session attribute
 		setPages(session, page);
 
 		int currentPage = (int) session.getAttribute("currentPage");
 		
+		// change current page when filtering applying
 		if(currentPage > pageCount) {
 			currentPage = pageCount;
 			setPages(session, String.valueOf(currentPage));
 		}
-
+		
+		// get start position
 		int offset = (currentPage-1)*COUNT;
 		
 		if(dateRange != null) {
@@ -102,22 +142,42 @@ public class TripsPageCommand extends Command {
 		return trips;
 	}
 	
+	/**
+	 * Finds all trips in DB by specified personId and dateRange, sets required session attributes.
+	 * 
+	 * @param session - current session.
+	 * 
+	 * @param personId - filtering condition.
+	 * 
+	 * @param dateRange - filtering condition.
+	 * 
+	 * @param page - page number.
+	 * 
+	 * @param sorting - sorting method.
+	 * 
+	 * @return List of trips.
+	 */		
 	private List<Trip> getTripsByPerson(HttpSession session, Long personId, String dateRange, String page, String sorting){
 		List<Trip> trips = null;
-		TripService tripService = new TripService(new MySqlTripDao(DBManager.getDataSource()));
 		
+		// calculate page count by specified dateRange or without it
 		int pageCount = (dateRange == null) ? tripService.getPages(personId, COUNT) : tripService.getPages(personId, dateRange, COUNT);
+		
+		// set page count as session attribute
 		session.setAttribute("totalPages", pageCount);
+		
+		// set page as session attribute
 		setPages(session, page);
 		
-
 		int currentPage = (int) session.getAttribute("currentPage");
 		
+		// change current page when filtering applying
 		if(currentPage > pageCount) {
 			currentPage = pageCount;
 			setPages(session, String.valueOf(currentPage));
 		}
 		
+		// get start position
 		int offset = (currentPage-1)*COUNT;
 		
 		if(dateRange != null) {
@@ -129,10 +189,19 @@ public class TripsPageCommand extends Command {
 		return trips;
 	}
 	
+	/**
+	 * Prepares all trips to be sent to the view.
+	 * 
+	 * @param personService - service object for Person entity.
+	 * 
+	 * @param trips - List of trips.
+	 * 
+	 * @param lang - language.
+	 * 
+	 * @return List of tripDto objects.
+	 */			
 	private List<TripDto> getTripDtoList(PersonService personService, List<Trip> trips, String lang){
 		List<TripDto> result = new ArrayList<>();
-				
-		LocationService locationService = new LocationService(new MySqlLocationDao(DBManager.getDataSource()));
 		
 		for (Trip trip : trips) {
 			TripDto tripDto = new TripDto();
@@ -155,6 +224,14 @@ public class TripsPageCommand extends Command {
 		return result;
 	}
 	
+	/**
+	 * Validates sorting method and sets it as session attribute.
+	 * 
+	 * @param session - current session.
+	 * 
+	 * @param sorting - sorting method.
+	 * 
+	 */				
 	private void setSorting(HttpSession session, String sorting) {
 		String defaultSorting = "date_desc";
 		
@@ -186,6 +263,14 @@ public class TripsPageCommand extends Command {
 		
 	}
 	
+	/**
+	 * Validates page parameter and sets it as session attribute.
+	 * 
+	 * @param session - current session.
+	 * 
+	 * @param page - page number.
+	 * 
+	 */		
 	private void setPages(HttpSession session, String page) {
 		Object currentPage = session.getAttribute("currentPage");
 		int pageCount = (int) session.getAttribute("totalPages");
@@ -199,7 +284,7 @@ public class TripsPageCommand extends Command {
 					pageIntValue = Integer.parseInt(page);
 					
 				}catch(NumberFormatException e) {
-					LOG.debug("page parameter is not a number");
+					LOG.error("page parameter is not a number");
 				}
 				
 				if(pageIntValue > 0 && pageIntValue <= pageCount) {
@@ -209,10 +294,18 @@ public class TripsPageCommand extends Command {
 		}
 	}
 	
+	/**
+	 * Handles errors with filtering and trips status change.
+	 * 
+	 * @param request - HttpServletRequest.
+	 * 
+	 */	
 	private void setErrorMessage(HttpServletRequest request) {
 		
+		// obtain error message from the request
 		String errorMessage = request.getParameter("error");
 		
+		// handle error message from the request, if not null set appropriate attribute
 		if(errorMessage != null) {
 			switch (errorMessage) {
 				case "filter_format":
@@ -224,8 +317,7 @@ public class TripsPageCommand extends Command {
 				default:
 					break;
 			}
-		}
-		
+		}	
 	}
 
 }

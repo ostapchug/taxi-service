@@ -20,7 +20,8 @@ public class Fields {
 	public static final String LOCATION__ID = "l_id";
 	public static final String LOCATION__STREET_NAME = "l_street_name";
 	public static final String LOCATION__STREET_NUMBER = "l_street_number";
-	public static final String LOCATION__COORDINATES = "l_coordinates";
+	public static final String LOCATION__LATITUDE = "l_latitude";
+	public static final String LOCATION__LONGITUDE = "l_longitude";
 	
 	public static final String CAR__ID = "c_id";
 	public static final String CAR__REG_NUMBER = "c_reg_number";

@@ -1,5 +1,8 @@
 package com.example.taxiservice.web;
 
+/**
+ * Custom function
+*/
 public final class ReplaceAll {
 	private ReplaceAll() {
 	}
