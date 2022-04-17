@@ -1,7 +1,9 @@
 package com.example.taxiservice.web.command.trip;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -13,10 +15,12 @@ import org.slf4j.LoggerFactory;
 
 import com.example.taxiservice.factory.annotation.InjectByType;
 import com.example.taxiservice.model.Car;
+import com.example.taxiservice.model.CarModel;
 import com.example.taxiservice.model.Role;
 import com.example.taxiservice.model.Trip;
 import com.example.taxiservice.model.TripStatus;
 import com.example.taxiservice.model.dto.TripDto;
+import com.example.taxiservice.service.CarModelService;
 import com.example.taxiservice.service.CarService;
 import com.example.taxiservice.service.LocationService;
 import com.example.taxiservice.service.PersonService;
@@ -35,6 +39,9 @@ public class TripPageCommand extends Command {
 	
 	@InjectByType
 	private CarService carService;
+	
+	@InjectByType
+	private CarModelService carModelService;
 	
 	@InjectByType
 	private LocationService locationService;
@@ -77,7 +84,9 @@ public class TripPageCommand extends Command {
 		
 		// if no errors found proceed
 		if(errorMessage == null && trip != null) {
-			List<Car> cars = carService.findCarsByTripId(trip.getId());
+			Map<Car, CarModel> cars = new HashMap<>();
+			List<Car> carList = carService.findCarsByTripId(trip.getId());
+			carList.stream().forEach(c -> cars.put(c, carModelService.find(c.getModelId())));
 			
 			// if role equals admin then load trip
 			if(Role.ADMIN.getName().equals(role)) {
@@ -104,7 +113,7 @@ public class TripPageCommand extends Command {
 		return result;
 	}
 	
-	private TripDto getTripDto(Trip trip, List<Car> cars, String lang) {
+	private TripDto getTripDto(Trip trip, Map<Car, CarModel> cars, String lang) {
 		TripDto result = new TripDto();
 		
 		String origin = locationService.find(trip.getOriginId(), lang).toString();

@@ -28,7 +28,7 @@ public class CarDaoMySql extends AbstractDao<Car> implements CarDao {
 	private static final String SQL__FIND_CAR_BY_CATEGORY_AND_CAPACITY = "SELECT * FROM car INNER JOIN car_model ON c_model = cm_id WHERE c_category=? AND c_status=0 AND cm_seat_count >=? ORDER BY cm_seat_count LIMIT 1";
 	private static final String SQL__FIND_CAR_BY_CAPACITY = "SELECT * FROM car INNER JOIN car_model ON c_model = cm_id WHERE c_status=0 AND cm_seat_count >=? ORDER BY cm_seat_count LIMIT 1";
 	private static final String SQL__FIND_CARS_BY_TRIP_ID = "SELECT * FROM car INNER JOIN m2m_trip_car ON car.c_id = m2m_trip_car.c_id WHERE t_id = ?";
-	private static final String SQL__INSERT_CAR = "INSERT INTO car (c_reg_number, c_model, c_category, c_location, c_status) VALUES (?,?,?,?,?)";
+	private static final String SQL__INSERT_CAR = "INSERT INTO car (c_reg_number, c_model, c_category, c_location) VALUES (?,?,?,?)";
 	private static final String SQL__UPDATE_CAR = "UPDATE car SET c_reg_number=?, c_model=?, c_category=?, c_location=?, c_status=?  WHERE c_id = ?";
 	private static final String SQL__CALL_GET_CARS = "{CALL get_cars(?,?)}";
 	
@@ -83,7 +83,6 @@ public class CarDaoMySql extends AbstractDao<Car> implements CarDao {
 			statement.setLong(2, car.getModelId());
 			statement.setLong(3, car.getCategoryId());
 			statement.setLong(4, car.getLocationId());
-			statement.setLong(5, car.getStatusId());
 			statement.executeUpdate();
 			set = statement.getGeneratedKeys();
 			
@@ -117,7 +116,7 @@ public class CarDaoMySql extends AbstractDao<Car> implements CarDao {
 			statement.setLong(2, car.getModelId());
 			statement.setLong(3, car.getCategoryId());
 			statement.setLong(4, car.getLocationId());
-			statement.setLong(5, car.getStatusId());
+			statement.setInt(5, car.getStatusId());
 			statement.setLong(6, car.getId());
 			statement.executeUpdate();
 			

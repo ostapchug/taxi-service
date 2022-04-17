@@ -69,9 +69,9 @@ public class SignUpCommand extends Command {
 			errorMessage = "password";
 		}else if(!PersonService.validatePasswordConfirm(password, passwordConfirm)) {
 			errorMessage = "password_confirm";
-		}else if(!name.isEmpty() && !PersonService.validateText(name)) {
+		}else if(name!= null && !name.isEmpty() && !PersonService.validateText(name)) {
 			errorMessage = "name";
-		}else if(!surname.isEmpty() && !PersonService.validateText(surname)) {
+		}else if(surname!= null && !surname.isEmpty() && !PersonService.validateText(surname)) {
 			errorMessage = "surname";
 		}
 		
@@ -82,8 +82,7 @@ public class SignUpCommand extends Command {
 		}
 		
 		if(errorMessage == null) {
-			PersonService.hashPassword(password);
-			PersonService.hashPassword(passwordConfirm);
+			password = PersonService.hashPassword(password);
 			Person person = new Person();
 			person.setPhone(phone);
 			person.setPassword(password);

@@ -22,19 +22,25 @@ public class InjectDataSourceAnnotationObjectConfigurator implements ObjectConfi
 		
 		LOG.debug("Configuring starts");
 		
-		for (Field field : t.getClass().getSuperclass().getDeclaredFields()) {
-					
-			if (field.isAnnotationPresent(InjectDataSource.class)) {
-				DataSource dataSource = context.getDataSource();
-				field.setAccessible(true);
-				try {
-					field.set(t, dataSource);
-				} catch (IllegalArgumentException | IllegalAccessException e) {
-					LOG.error(e.getMessage());
+		Class<?> current = t.getClass();
+		while(current.getSuperclass() != null){
+			
+			for (Field field : current.getDeclaredFields()) {
+				
+				if (field.isAnnotationPresent(InjectDataSource.class)) {
+					DataSource dataSource = context.getDataSource();
+					field.setAccessible(true);
+					try {
+						field.set(t, dataSource);
+					} catch (IllegalArgumentException | IllegalAccessException e) {
+						LOG.error(e.getMessage());
+					}
 				}
+				
 			}
 			
-		}
+		    current = current.getSuperclass();
+		}		
 		
 		LOG.debug("Configuring finished");		
 	}

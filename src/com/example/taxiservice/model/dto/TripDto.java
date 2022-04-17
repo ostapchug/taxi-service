@@ -2,9 +2,10 @@ package com.example.taxiservice.model.dto;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
-import java.util.List;
+import java.util.Map;
 
 import com.example.taxiservice.model.Car;
+import com.example.taxiservice.model.CarModel;
 
 /**
  * Provide records for trip details page.
@@ -18,7 +19,7 @@ public class TripDto {
 	private Timestamp date;
 	private BigDecimal bill;
 	private String status;
-	private List<Car> cars;
+	private Map<Car, CarModel> cars;
 	
 	public Long getId() {
 		return id;
@@ -83,12 +84,12 @@ public class TripDto {
 	public void setStatus(String status) {
 		this.status = status;
 	}
-	
-	public List<Car> getCars() {
+
+	public Map<Car, CarModel> getCars() {
 		return cars;
 	}
-	
-	public void setCars(List<Car> cars) {
+
+	public void setCars(Map<Car, CarModel> cars) {
 		this.cars = cars;
 	}
 

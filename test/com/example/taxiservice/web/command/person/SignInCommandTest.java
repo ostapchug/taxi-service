@@ -29,21 +29,17 @@ public class SignInCommandTest {
 	
 	@Mock 
 	private HttpServletRequest request;
-	
 	@Mock 
 	private HttpServletResponse response;
-	
 	@Mock
 	private HttpSession session;
-	
 	@Mock
 	private PersonService personService;
-	
-	private Person person;
 	
 	@InjectMocks
 	private SignInCommand signInCommand;
 	
+	private Person person;
 	private String phone = "0123456781";
 	private String password = "Client#1";
 

@@ -91,7 +91,7 @@ public class SignInCommand extends Command {
 			
 			Role personRole = Role.getRole(person);
 			session.setAttribute("personRole", personRole.getName());
-			LOG.info("Person: " + person + " logged with role: " + personRole.getName());
+			LOG.info("Person: " + person.getPhone() + " logged with role: " + personRole.getName());
 			
 			result = new Page(Path.COMMAND__HOME_PAGE, true);
 			

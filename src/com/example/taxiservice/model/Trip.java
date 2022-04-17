@@ -79,5 +79,63 @@ public class Trip extends Entity {
 		return "Trip [personId=" + personId + ", originId=" + originId + ", destinationId=" + destinationId
 				+ ", distance=" + distance + ", date=" + date + ", bill=" + bill + ", statusId=" + statusId + "]";
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((bill == null) ? 0 : bill.hashCode());
+		result = prime * result + ((date == null) ? 0 : date.hashCode());
+		result = prime * result + ((destinationId == null) ? 0 : destinationId.hashCode());
+		result = prime * result + ((distance == null) ? 0 : distance.hashCode());
+		result = prime * result + ((originId == null) ? 0 : originId.hashCode());
+		result = prime * result + ((personId == null) ? 0 : personId.hashCode());
+		result = prime * result + statusId;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Trip other = (Trip) obj;
+		if (bill == null) {
+			if (other.bill != null)
+				return false;
+		} else if (!bill.equals(other.bill))
+			return false;
+		if (date == null) {
+			if (other.date != null)
+				return false;
+		} else if (!date.equals(other.date))
+			return false;
+		if (destinationId == null) {
+			if (other.destinationId != null)
+				return false;
+		} else if (!destinationId.equals(other.destinationId))
+			return false;
+		if (distance == null) {
+			if (other.distance != null)
+				return false;
+		} else if (!distance.equals(other.distance))
+			return false;
+		if (originId == null) {
+			if (other.originId != null)
+				return false;
+		} else if (!originId.equals(other.originId))
+			return false;
+		if (personId == null) {
+			if (other.personId != null)
+				return false;
+		} else if (!personId.equals(other.personId))
+			return false;
+		if (statusId != other.statusId)
+			return false;
+		return true;
+	}
 	
 }

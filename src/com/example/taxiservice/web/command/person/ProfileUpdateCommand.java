@@ -66,13 +66,13 @@ public class ProfileUpdateCommand extends Command{
 		// validate person data from the request
 		if(!PersonService.validatePhone(phone)) {
 			errorMessage = "phone_format";
-		}else if(!password.isEmpty() && !PersonService.validatePassword(password)) {
+		}else if(password != null && !password.isEmpty() && !PersonService.validatePassword(password)) {
 			errorMessage = "password";
-		}else if(!password.isEmpty() && !PersonService.validatePasswordConfirm(password, passwordConfirm)) {
+		}else if(password != null && !password.isEmpty() && !PersonService.validatePasswordConfirm(password, passwordConfirm)) {
 			errorMessage = "password_confirm";
-		}else if(!name.isEmpty() && !PersonService.validateText(name)) {
+		}else if(name!= null && !name.isEmpty() && !PersonService.validateText(name)) {
 			errorMessage = "name";
-		}else if(!surname.isEmpty() && !PersonService.validateText(surname)) {
+		}else if(surname!= null && !surname.isEmpty() && !PersonService.validateText(surname)) {
 			errorMessage = "surname";
 		}
 		
@@ -82,7 +82,7 @@ public class ProfileUpdateCommand extends Command{
 		Person personById = personService.find(personId);
 		Person personByPhone = personService.find(phone);
 				
-		if(personByPhone != null && !personByPhone.getPhone().equals(personById.getPhone())) {
+		if(personByPhone != null && !personById.getPhone().equals(personByPhone.getPhone())) {
 			errorMessage ="phone_exist";
 		}
 		

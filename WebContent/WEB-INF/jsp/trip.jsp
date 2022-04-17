@@ -103,7 +103,7 @@
         </td>
         <td>
 	        <c:forEach var="car" items="${trip.cars}">
-	        	<span class="label label-default"><c:out value="${car.regNumber}"/></span>
+	        	<span class="label label-default"><c:out value="${car.value}"/>, <c:out value="${car.key.regNumber}"/></span>
 	        </c:forEach>
 		</td>
 	  </tr>	

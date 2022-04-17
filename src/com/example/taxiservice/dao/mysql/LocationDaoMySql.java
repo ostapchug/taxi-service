@@ -154,6 +154,7 @@ public class LocationDaoMySql extends AbstractDao<Location> implements LocationD
 			statement.setString(2, location.getStreetNumber());
 			statement.setBigDecimal(3, location.getLongitude());
 			statement.setBigDecimal(4, location.getLatitude());
+			statement.setLong(5, location.getId());
 			statement.executeUpdate();
 			
 			commit(connection);

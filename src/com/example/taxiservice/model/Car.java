@@ -59,4 +59,50 @@ public class Car extends Entity{
 				+ locationId + ", statusId=" + statusId + "]";
 	}
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((categoryId == null) ? 0 : categoryId.hashCode());
+		result = prime * result + ((locationId == null) ? 0 : locationId.hashCode());
+		result = prime * result + ((modelId == null) ? 0 : modelId.hashCode());
+		result = prime * result + ((regNumber == null) ? 0 : regNumber.hashCode());
+		result = prime * result + statusId;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Car other = (Car) obj;
+		if (categoryId == null) {
+			if (other.categoryId != null)
+				return false;
+		} else if (!categoryId.equals(other.categoryId))
+			return false;
+		if (locationId == null) {
+			if (other.locationId != null)
+				return false;
+		} else if (!locationId.equals(other.locationId))
+			return false;
+		if (modelId == null) {
+			if (other.modelId != null)
+				return false;
+		} else if (!modelId.equals(other.modelId))
+			return false;
+		if (regNumber == null) {
+			if (other.regNumber != null)
+				return false;
+		} else if (!regNumber.equals(other.regNumber))
+			return false;
+		if (statusId != other.statusId)
+			return false;
+		return true;
+	}
+
 }
