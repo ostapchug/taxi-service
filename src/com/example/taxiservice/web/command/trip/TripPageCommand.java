@@ -25,7 +25,10 @@ import com.example.taxiservice.service.CarService;
 import com.example.taxiservice.service.LocationService;
 import com.example.taxiservice.service.PersonService;
 import com.example.taxiservice.service.TripService;
+import com.example.taxiservice.web.Attribute;
+import com.example.taxiservice.web.Error;
 import com.example.taxiservice.web.Page;
+import com.example.taxiservice.web.Parameter;
 import com.example.taxiservice.web.Path;
 import com.example.taxiservice.web.command.Command;
 
@@ -36,19 +39,19 @@ public class TripPageCommand extends Command {
 
 	private static final long serialVersionUID = -4793599624749188289L;
 	private static final Logger LOG = LoggerFactory.getLogger(TripPageCommand.class);
-	
+
 	@InjectByType
 	private CarService carService;
-	
+
 	@InjectByType
 	private CarModelService carModelService;
-	
+
 	@InjectByType
 	private LocationService locationService;
-	
+
 	@InjectByType
 	private PersonService personService;
-	
+
 	@InjectByType
 	private TripService tripService;
 
@@ -59,68 +62,67 @@ public class TripPageCommand extends Command {
 	@Override
 	public Page execute(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 		LOG.debug("Command start");
-		
+
 		Page result = null;
 		HttpSession session = request.getSession(false);
-		
+
 		// obtain required data from session
-		String role = (String) session.getAttribute("personRole");
-		String lang = (String) session.getAttribute("locale");
-		long personId = (long) session.getAttribute("personId");
+		String role = (String) session.getAttribute(Attribute.PERSON__ROLE);
+		String lang = (String) session.getAttribute(Attribute.LOCALE);
+		long personId = (long) session.getAttribute(Attribute.PERSON__ID);
 		long tripId;
 		Trip trip = null;
 		String errorMessage = null;
-		
+
 		// obtain trip id from the request
-		String id = request.getParameter("trip");
-		
+		String id = request.getParameter(Parameter.TRIP_ID);
+
 		// validate trip id
 		try {
 			tripId = Long.parseLong(id);
 			trip = tripService.find(tripId);
-		}catch(NumberFormatException e) {
-			errorMessage = "trip_not_found";	
+		} catch (NumberFormatException e) {
+			errorMessage = Error.TRIP__NOT_FOUND;
 		}
-		
+
 		// if no errors found proceed
-		if(errorMessage == null && trip != null) {
+		if (errorMessage == null && trip != null) {
 			Map<Car, CarModel> cars = new HashMap<>();
 			List<Car> carList = carService.findCarsByTripId(trip.getId());
 			carList.stream().forEach(c -> cars.put(c, carModelService.find(c.getModelId())));
-			
+
 			// if role equals admin then load trip
-			if(Role.ADMIN.getName().equals(role)) {
+			if (Role.ADMIN.getName().equals(role)) {
 				TripDto tripDto = getTripDto(trip, cars, lang);
-				request.setAttribute("trip", tripDto);
+				request.setAttribute(Attribute.TRIP, tripDto);
 				result = new Page(Path.PAGE__TRIP);
-			}else {
+			} else {
 				// load trip if trip belongs to person
-				if(trip.getPersonId().equals(personId)) {
+				if (trip.getPersonId().equals(personId)) {
 					TripDto tripDto = getTripDto(trip, cars, lang);
-					request.setAttribute("trip", tripDto);
+					request.setAttribute(Attribute.TRIP, tripDto);
 					result = new Page(Path.PAGE__TRIP);
-				}else {
-					errorMessage = "access_denied";
-					result = new Page(Path.COMMAND__ERROR_PAGE + "&error=" + errorMessage, true);
+				} else {
+					result = new Page(Path.COMMAND__ERROR_PAGE + Parameter.ERROR__QUERY + Error.ACCESS_DENIED, true);
 				}
 			}
-			
-		}else {
-			result = new Page(Path.COMMAND__ERROR_PAGE + "&error=" + errorMessage, true);
+
+		} else {
+			result = new Page(Path.COMMAND__ERROR_PAGE + Parameter.ERROR__QUERY + Error.NOT_FOUND, true);
 		}
-		
+
 		LOG.debug("Command finish");
 		return result;
 	}
-	
+
 	private TripDto getTripDto(Trip trip, Map<Car, CarModel> cars, String lang) {
 		TripDto result = new TripDto();
-		
+
 		String origin = locationService.find(trip.getOriginId(), lang).toString();
 		String destination = locationService.find(trip.getDestinationId(), lang).toString();
 		String phone = personService.find(trip.getPersonId()).getPhone();
 		TripStatus tripStatus = TripStatus.getTripStatus(trip);
-		
+
 		result.setId(trip.getId());
 		result.setPersonPhone(phone);
 		result.setOrigin(origin);
@@ -130,7 +132,7 @@ public class TripPageCommand extends Command {
 		result.setBill(trip.getBill());
 		result.setStatus(tripStatus.getName());
 		result.setCars(cars);
-		
+
 		return result;
 	}
 

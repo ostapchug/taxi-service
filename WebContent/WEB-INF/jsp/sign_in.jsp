@@ -6,13 +6,15 @@
 <%@ include file="/WEB-INF/jspf/head.jspf"%>
 <body>
 	<%@ include file="/WEB-INF/jspf/navbar.jspf"%>
-	
+
 	<div class="page-header">
 		<div class="container">
-			<h2><fmt:message key="general.anchor.sign_in" /></h2>
+			<h2>
+				<fmt:message key="general.anchor.sign_in" />
+			</h2>
 		</div>
 	</div>
-	
+
 	<div class="container">
 		<div class="row">
 			<div class="col-sm-offset-3 col-md-6 inf-content">
@@ -24,14 +26,16 @@
 					method="post">
 					<!-- Phone input-->
 					<div class="form-group">
-						<label class="control-label col-sm-3" for="phone">
-						<fmt:message key="general.label.anchor.phone" />
+						<label class="control-label col-sm-3" for="phone"> <fmt:message
+								key="general.label.anchor.phone" />
 						</label>
 						<div class="col-sm-8">
-							<input type="text" name="phone"	placeholder="<fmt:message key="general.label.anchor.phone_placeholder"/>" value="<c:out value="${phone}"/>" class="form-control" required>
-							<span class="help-block"> 
-								<c:if test="${not empty errorPhone}">
-									<fmt:message key="${errorPhone}"/>
+							<input type="text" name="phone"
+								placeholder="<fmt:message key="general.label.anchor.phone_placeholder"/>"
+								value="<c:out value="${phone}"/>" class="form-control" required>
+							<span class="help-block"> <c:if
+									test="${not empty errorPhone}">
+									<fmt:message key="${errorPhone}" />
 								</c:if>
 							</span>
 						</div>
@@ -39,14 +43,15 @@
 
 					<!-- Password input-->
 					<div class="form-group">
-						<label class="control-label col-sm-3" for="password">
-						<fmt:message key="general.label.anchor.password" />
+						<label class="control-label col-sm-3" for="password"> <fmt:message
+								key="general.label.anchor.password" />
 						</label>
 						<div class="col-sm-8">
-							<input type="password" name="password" placeholder="<fmt:message key="general.label.anchor.password_placeholder"/>" class="form-control" required> 
-							<span class="help-block">
+							<input type="password" name="password"
+								placeholder="<fmt:message key="general.label.anchor.password_placeholder"/>"
+								class="form-control" required> <span class="help-block">
 								<c:if test="${not empty errorPassword}">
-									<fmt:message key="${errorPassword}"/>
+									<fmt:message key="${errorPassword}" />
 								</c:if>
 							</span>
 						</div>
@@ -56,11 +61,12 @@
 					<div class="form-group">
 						<div class="col-sm-offset-3 col-sm-8">
 							<button type="submit" class="btn btn-primary">
-								<fmt:message key="general.button.anchor.submit"/>
+								<fmt:message key="general.button.anchor.submit" />
 							</button>
 							&nbsp;
-							<fmt:message key="sign_in_jsp.anchor.hint"/>
-							<a href="?command=sign_up_page"><fmt:message key="general.anchor.sign_up"/></a>
+							<fmt:message key="sign_in_jsp.anchor.hint" />
+							<a href="?command=sign_up_page"><fmt:message
+									key="general.anchor.sign_up" /></a>
 						</div>
 					</div>
 				</form>

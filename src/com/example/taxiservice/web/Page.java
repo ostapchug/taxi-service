@@ -6,7 +6,7 @@ package com.example.taxiservice.web;
 public class Page {
 	private String path;
 	private boolean isRedirect;
-	
+
 	public Page(String path) {
 		this.path = path;
 	}

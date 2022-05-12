@@ -2,12 +2,12 @@ package com.example.taxiservice.web;
 
 /**
  * Path holder (jsp pages and controller commands)
-*/
+ */
 public final class Path {
-	
+
 	private Path() {
 	}
-	
+
 	// pages
 	public static final String PAGE__HOME_PAGE = "/WEB-INF/jsp/home.jsp";
 	public static final String PAGE__SIGN_IN = "/WEB-INF/jsp/sign_in.jsp";
@@ -20,7 +20,7 @@ public final class Path {
 	public static final String PAGE__TRIP_OFFER = "/WEB-INF/jsp/trip_offer.jsp";
 	public static final String PAGE__TRIP_CONFIRM = "/WEB-INF/jsp/trip_confirm.jsp";
 	public static final String PAGE__ERROR = "/WEB-INF/jsp/error.jsp";
-	
+
 	// commands
 	public static final String COMMAND__HOME_PAGE = "?command=home_page";
 	public static final String COMMAND__ERROR_PAGE = "?command=error_page";

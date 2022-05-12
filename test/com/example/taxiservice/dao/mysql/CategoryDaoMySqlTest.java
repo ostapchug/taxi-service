@@ -29,7 +29,7 @@ import com.example.taxiservice.model.Category;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CategoryDaoMySqlTest {
-	
+
 	@Mock
 	private DataSource dataSource;
 	@Mock
@@ -38,10 +38,10 @@ public class CategoryDaoMySqlTest {
 	private PreparedStatement statement;
 	@Mock
 	private ResultSet set;
-	
+
 	@InjectMocks
 	private CategoryDaoMySql categoryDaoMySql;
-	
+
 	private Category category;
 
 	@Before
@@ -50,15 +50,15 @@ public class CategoryDaoMySqlTest {
 		category.setId(1L);
 		category.setName("Economy");
 		category.setPrice(new BigDecimal(25));
-		
+
 		when(dataSource.getConnection()).thenReturn(connection);
-		
+
 		when(connection.prepareStatement(anyString())).thenReturn(statement);
 		when(connection.prepareStatement(anyString(), anyInt())).thenReturn(statement);
-		
+
 		when(statement.executeQuery()).thenReturn(set);
 		when(statement.getGeneratedKeys()).thenReturn(set);
-		
+
 		when(set.next()).thenReturn(Boolean.TRUE, Boolean.FALSE);
 		when(set.getLong(Fields.CATEGORY__ID)).thenReturn(category.getId());
 		when(set.getString(Fields.CATEGORY__NAME)).thenReturn(category.getName());
@@ -70,10 +70,10 @@ public class CategoryDaoMySqlTest {
 		Category result = categoryDaoMySql.find(1L);
 		assertEquals(category, result);
 	}
-	
+
 	@Test
 	public void testInsert() throws SQLException {
-		
+
 		categoryDaoMySql.insert(category);
 
 		// verify and assert
@@ -84,12 +84,12 @@ public class CategoryDaoMySqlTest {
 		verify(set, times(2)).next();
 		verify(set, times(1)).getLong(anyInt());
 		verify(connection, times(1)).commit();
-		
+
 	}
-	
+
 	@Test
 	public void testUpdate() throws SQLException {
-		
+
 		categoryDaoMySql.update(category);
 
 		// verify and assert
@@ -99,7 +99,7 @@ public class CategoryDaoMySqlTest {
 		verify(statement, times(1)).setLong(anyInt(), anyLong());
 		verify(statement, times(1)).executeUpdate();
 		verify(connection, times(1)).commit();
-		
+
 	}
 
 }

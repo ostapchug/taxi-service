@@ -23,22 +23,23 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import com.example.taxiservice.model.Person;
 import com.example.taxiservice.service.PersonService;
+import com.example.taxiservice.web.Parameter;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SignInCommandTest {
-	
-	@Mock 
+
+	@Mock
 	private HttpServletRequest request;
-	@Mock 
+	@Mock
 	private HttpServletResponse response;
 	@Mock
 	private HttpSession session;
 	@Mock
 	private PersonService personService;
-	
+
 	@InjectMocks
 	private SignInCommand signInCommand;
-	
+
 	private Person person;
 	private String phone = "0123456781";
 	private String password = "Client#1";
@@ -50,9 +51,9 @@ public class SignInCommandTest {
 		person.setPhone("0123456781");
 		person.setPassword("7b9c03298c85e20c45d2e3128e0c28a0a2b72c421277335ede1d3ad688692be6");
 		person.setRoleId(1);
-		
-		when(request.getParameter("phone")).thenReturn(phone);
-		when(request.getParameter("password")).thenReturn(password);
+
+		when(request.getParameter(Parameter.PERSON__PHONE)).thenReturn(phone);
+		when(request.getParameter(Parameter.PERSON__PASSWORD)).thenReturn(password);
 		when(request.getMethod()).thenReturn("POST");
 		when(request.getSession(true)).thenReturn(session);
 	}
@@ -60,20 +61,19 @@ public class SignInCommandTest {
 	@Test
 	public void testSignIn() throws IOException, ServletException {
 		when(personService.find(phone)).thenReturn(person);
-		
+
 		signInCommand.execute(request, response);
-		
+
 		verify(request, times(1)).getSession(true);
 		verify(session, times(5)).setAttribute(anyString(), any());
 	}
-	
+
 	@Test
 	public void testSignInFail() throws IOException, ServletException {
 		signInCommand.execute(request, response);
-		
+
 		verify(request, never()).getSession(true);
 		verify(session, never()).setAttribute(anyString(), any());
 	}
-
 
 }

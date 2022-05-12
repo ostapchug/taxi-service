@@ -20,14 +20,14 @@ import com.example.taxiservice.model.CarModel;
  */
 
 @Singleton
-public class CarModelDaoMySql extends AbstractDao<CarModel> implements CarModelDao{
-	
+public class CarModelDaoMySql extends AbstractDao<CarModel> implements CarModelDao {
+
 	private static final String SQL__FIND_CAR_MODEL_BY_ID = "SELECT * FROM car_model WHERE cm_id=?";
 	private static final String SQL__INSERT_CAR_MODEL = "INSERT INTO car_model (cm_brand, cm_name, cm_color, cm_year, cm_seat_count) VALUES (?,?,?,?,?)";
 	private static final String SQL__UPDATE_CAR_MODEL = "UPDATE car_model SET cm_brand=?, cm_name=?, cm_color=?, cm_year=?, cm_seat_count=?  WHERE c_id = ?";
-	
+
 	private static final Logger LOG = LoggerFactory.getLogger(CarModelDaoMySql.class);
-	
+
 	public CarModelDaoMySql() {
 		LOG.info("MySqlCarModelDao initialized");
 	}
@@ -35,31 +35,31 @@ public class CarModelDaoMySql extends AbstractDao<CarModel> implements CarModelD
 	@Override
 	public CarModel find(Long id) {
 		CarModel carModel = null;
-		
+
 		Connection connection = null;
 		PreparedStatement statement = null;
 		ResultSet set = null;
-		
+
 		try {
 			connection = getConnection();
 			statement = connection.prepareStatement(SQL__FIND_CAR_MODEL_BY_ID);
 			statement.setLong(1, id);
 			set = statement.executeQuery();
-			
+
 			while (set.next()) {
-				carModel = mapRow(set);						
+				carModel = mapRow(set);
 			}
-			
+
 			commit(connection);
-			
+
 		} catch (SQLException e) {
 			rollback(connection);
 			LOG.error(e.getMessage());
 		} finally {
-			
-			close(set, statement, connection);			
+
+			close(set, statement, connection);
 		}
-		
+
 		return carModel;
 	}
 
@@ -69,7 +69,7 @@ public class CarModelDaoMySql extends AbstractDao<CarModel> implements CarModelD
 		Connection connection = null;
 		PreparedStatement statement = null;
 		ResultSet set = null;
-		
+
 		try {
 			connection = getConnection();
 			statement = connection.prepareStatement(SQL__INSERT_CAR_MODEL, Statement.RETURN_GENERATED_KEYS);
@@ -80,21 +80,21 @@ public class CarModelDaoMySql extends AbstractDao<CarModel> implements CarModelD
 			statement.setInt(5, carModel.getSeatCount());
 			statement.executeUpdate();
 			set = statement.getGeneratedKeys();
-			
+
 			while (set.next()) {
-				carModel.setId(set.getLong(1));							
+				carModel.setId(set.getLong(1));
 			}
-			
+
 			commit(connection);
 			result = true;
-			
+
 		} catch (SQLException e) {
 			rollback(connection);
 			LOG.error(e.getMessage());
 		} finally {
-			close(set, statement, connection);	
+			close(set, statement, connection);
 		}
-		
+
 		return result;
 	}
 
@@ -103,7 +103,7 @@ public class CarModelDaoMySql extends AbstractDao<CarModel> implements CarModelD
 		boolean result = false;
 		Connection connection = null;
 		PreparedStatement statement = null;
-		
+
 		try {
 			connection = getConnection();
 			statement = connection.prepareStatement(SQL__UPDATE_CAR_MODEL);
@@ -114,37 +114,37 @@ public class CarModelDaoMySql extends AbstractDao<CarModel> implements CarModelD
 			statement.setInt(5, carModel.getSeatCount());
 			statement.setLong(6, carModel.getId());
 			statement.executeUpdate();
-			
+
 			commit(connection);
 			result = true;
-			
-		}catch (SQLException e) {
+
+		} catch (SQLException e) {
 			rollback(connection);
 			LOG.error(e.getMessage());
 		} finally {
-			close(statement, connection);	
+			close(statement, connection);
 		}
-		
+
 		return result;
 	}
 
 	@Override
 	protected CarModel mapRow(ResultSet set) {
 		CarModel carModel = null;
-		
+
 		try {
 			carModel = new CarModel();
-			
+
 			carModel.setId(set.getLong(Fields.CAR_MODEL__ID));
 			carModel.setBrand(set.getString(Fields.CAR_MODEL__BRAND));
 			carModel.setName(set.getString(Fields.CAR_MODEL__NAME));
 			carModel.setColor(set.getString(Fields.CAR_MODEL__COLOR));
 			carModel.setYear(set.getInt(Fields.CAR_MODEL__YEAR));
 			carModel.setSeatCount(set.getInt(Fields.CAR_MODEL__SEAT_COUNT));
-			
-        } catch (SQLException e) {
-        	LOG.error(e.getMessage());
-        }
+
+		} catch (SQLException e) {
+			LOG.error(e.getMessage());
+		}
 		return carModel;
 	}
 

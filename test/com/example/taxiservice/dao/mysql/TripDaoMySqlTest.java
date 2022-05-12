@@ -30,7 +30,7 @@ import com.example.taxiservice.model.Trip;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TripDaoMySqlTest {
-	
+
 	@Mock
 	private DataSource dataSource;
 	@Mock
@@ -39,13 +39,13 @@ public class TripDaoMySqlTest {
 	private PreparedStatement statement;
 	@Mock
 	private ResultSet set;
-	
+
 	@InjectMocks
 	private TripDaoMySql tripDaoMySql;
-	
+
 	private Trip trip;
 	private Car car;
-	private Car [] cars;
+	private Car[] cars;
 
 	@Before
 	public void setUp() throws Exception {
@@ -56,7 +56,7 @@ public class TripDaoMySqlTest {
 		trip.setDestinationId(2L);
 		trip.setDistance(new BigDecimal("1.5"));
 		trip.setBill(new BigDecimal("37.5"));
-		
+
 		car = new Car();
 		car.setId(1L);
 		car.setRegNumber("AA1234HH");
@@ -64,17 +64,17 @@ public class TripDaoMySqlTest {
 		car.setCategoryId(1L);
 		car.setLocationId(1L);
 		car.setStatusId(1);
-		
-		cars = new Car[] {car};
-		
+
+		cars = new Car[] { car };
+
 		when(dataSource.getConnection()).thenReturn(connection);
-		
+
 		when(connection.prepareStatement(anyString())).thenReturn(statement);
 		when(connection.prepareStatement(anyString(), anyInt())).thenReturn(statement);
-		
+
 		when(statement.executeQuery()).thenReturn(set);
 		when(statement.getGeneratedKeys()).thenReturn(set);
-		
+
 		when(set.next()).thenReturn(Boolean.TRUE, Boolean.FALSE);
 		when(set.getLong(Fields.TRIP__ID)).thenReturn(trip.getId());
 		when(set.getLong(Fields.TRIP__PERSON_ID)).thenReturn(trip.getPersonId());
@@ -89,10 +89,10 @@ public class TripDaoMySqlTest {
 		Trip result = tripDaoMySql.find(1L);
 		assertEquals(trip, result);
 	}
-	
+
 	@Test
 	public void testInsert() throws SQLException {
-		
+
 		tripDaoMySql.insert(trip);
 
 		// verify and assert
@@ -105,10 +105,10 @@ public class TripDaoMySqlTest {
 		verify(connection, times(1)).commit();
 
 	}
-	
+
 	@Test
 	public void testInsertWithCars() throws SQLException {
-		
+
 		tripDaoMySql.insert(trip, cars);
 
 		// verify and assert
@@ -118,14 +118,14 @@ public class TripDaoMySqlTest {
 		verify(statement, times(2)).setBigDecimal(anyInt(), any());
 		verify(statement, times(2)).executeUpdate();
 		verify(set, times(2)).next();
-		verify(set, times(1)).getLong(anyInt());		
+		verify(set, times(1)).getLong(anyInt());
 		verify(connection, times(1)).commit();
 
 	}
-	
+
 	@Test
 	public void testUpdate() throws SQLException {
-		
+
 		tripDaoMySql.update(trip);
 
 		// verify and assert
@@ -137,10 +137,10 @@ public class TripDaoMySqlTest {
 		verify(connection, times(1)).commit();
 
 	}
-	
+
 	@Test
 	public void testUpdateStatus() throws SQLException {
-		
+
 		tripDaoMySql.updateStatus(trip, "accepted");
 
 		// verify and assert

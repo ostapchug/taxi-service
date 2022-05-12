@@ -13,17 +13,17 @@ import com.example.taxiservice.factory.config.JavaCofig;
  * Application - initializes resources and returns context.
  */
 public class Application {
-	
+
 	private static final Logger LOG = LoggerFactory.getLogger(Application.class);
-	
-	public static AppContext run (String packageToScan,  Map<Class<?>, Class<?>> ifc2ImplClass, DataSource dataSource) {
+
+	public static AppContext run(String packageToScan, Map<Class<?>, Class<?>> ifc2ImplClass, DataSource dataSource) {
 		LOG.debug("Method run starts");
-		
-		JavaCofig config = new JavaCofig(packageToScan,  ifc2ImplClass);
+
+		JavaCofig config = new JavaCofig(packageToScan, ifc2ImplClass);
 		AppContext context = new AppContext(config, dataSource);
 		ObjectFactory objectFactory = new ObjectFactory(context);
 		context.setFactory(objectFactory);
-		
+
 		LOG.debug("Method run finished");
 		return context;
 	}

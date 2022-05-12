@@ -19,20 +19,22 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.example.taxiservice.web.Attribute;
+import com.example.taxiservice.web.Error;
+import com.example.taxiservice.web.Parameter;
 import com.example.taxiservice.web.Path;
 
 /**
  * Security filter
  */
 public class AccessFilter implements Filter {
-	
+
 	private static final Logger LOG = LoggerFactory.getLogger(AccessFilter.class);
-	
+
 	// commands access
-	private static List<String> user = new ArrayList<String>();	
+	private static List<String> user = new ArrayList<String>();
 	private static List<String> guest = new ArrayList<String>();
 	private static List<String> common = new ArrayList<String>();
-
 
 	public void destroy() {
 		LOG.debug("Filter destruction starts");
@@ -40,69 +42,68 @@ public class AccessFilter implements Filter {
 		LOG.debug("Filter destruction finished");
 	}
 
-
-	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+			throws IOException, ServletException {
 		LOG.debug("Filter starts");
-		
+
 		if (accessAllowed(request)) {
 			LOG.debug("Filter finished");
 			chain.doFilter(request, response);
 		} else {
-			String errorMessasge = "access_denied";
+			String errorMessasge = Error.ACCESS_DENIED;
 			LOG.debug("Set the request attribute: errorMessage --> " + errorMessasge);
 			HttpServletResponse httpResponse = (HttpServletResponse) response;
-			httpResponse.sendRedirect(Path.COMMAND__ERROR_PAGE + "&error=" + errorMessasge);
+			httpResponse.sendRedirect(Path.COMMAND__ERROR_PAGE + Parameter.ERROR__QUERY + errorMessasge);
 		}
 	}
-	
+
 	private boolean accessAllowed(ServletRequest request) {
 		boolean result = false;
 		Object personID = null;
-		
+
 		HttpServletRequest httpRequest = (HttpServletRequest) request;
 		HttpSession session = httpRequest.getSession(false);
-		
-		if(session != null) {
-			personID = session.getAttribute("personId");			
+
+		if (session != null) {
+			personID = session.getAttribute(Attribute.PERSON__ID);
 		}
-		
-		String commandName = request.getParameter("command");
+
+		String commandName = request.getParameter(Parameter.COMMAND);
 		LOG.debug(commandName);
-		
+
 		if (commandName != null && !commandName.isEmpty()) {
-			if(personID == null && guest.contains(commandName)) {
+			if (personID == null && guest.contains(commandName)) {
 				result = true;
-			}else if(personID != null && user.contains(commandName)) {
+			} else if (personID != null && user.contains(commandName)) {
 				result = true;
-			}else if(common.contains(commandName)) {
+			} else if (common.contains(commandName)) {
 				result = true;
 			}
-		}else {
+		} else {
 			result = true;
 		}
-		
+
 		return result;
 	}
 
-
 	public void init(FilterConfig fConfig) throws ServletException {
 		LOG.debug("Filter initialization starts");
-		
+
 		// user
-		user = asList(fConfig.getInitParameter("user"));
+		user = asList(fConfig.getInitParameter(Parameter.ACCESS_GROUP__USER));
 		LOG.debug("User commands --> " + user);
-		
+
 		// guest
-		guest = asList(fConfig.getInitParameter("guest"));
+		guest = asList(fConfig.getInitParameter(Parameter.ACCESS_GROUP__GUEST));
 		LOG.debug("Guest commands --> " + guest);
-		
+
 		// common
-		common = asList(fConfig.getInitParameter("common"));
+		common = asList(fConfig.getInitParameter(Parameter.ACCESS_GROUP__COMMON));
 		LOG.debug("Common commands --> " + common);
-		
+
 		LOG.debug("Filter initialization finished");
 	}
-	
+
 	/**
 	 * Extracts parameter values from string
 	 * 
@@ -113,9 +114,9 @@ public class AccessFilter implements Filter {
 	private List<String> asList(String str) {
 		List<String> list = new ArrayList<String>();
 		StringTokenizer st = new StringTokenizer(str);
-		while (st.hasMoreTokens()) list.add(st.nextToken());
-		return list;		
+		while (st.hasMoreTokens())
+			list.add(st.nextToken());
+		return list;
 	}
-
 
 }

@@ -16,10 +16,10 @@ import com.example.taxiservice.web.command.Command;
 /**
  * Home page command.
  */
-public class HomePageCommand extends Command{
+public class HomePageCommand extends Command {
 
 	private static final long serialVersionUID = -9130781253259901563L;
-	private static final Logger LOG = LoggerFactory.getLogger(HomePageCommand.class);		
+	private static final Logger LOG = LoggerFactory.getLogger(HomePageCommand.class);
 
 	public HomePageCommand() {
 		LOG.info("HomePageCommand initialized");

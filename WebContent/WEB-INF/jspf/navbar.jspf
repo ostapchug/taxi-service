@@ -1,59 +1,81 @@
 <nav class="navbar navbar-inverse">
-  <div class="container">
-    <div class="navbar-header">
-      <a class="navbar-brand" href="?command=home_page">Taxi Service</a>
-    </div>
-    <ul class="nav navbar-nav navbar-right">
-    <c:choose>
-    	<c:when test="${empty personId}">
-    		<li><a href="?command=sign_up_page"><span class="glyphicon glyphicon-user"></span>&nbsp;<fmt:message key="general.anchor.sign_up"/></a></li>
-    		<li><a href="?command=sign_in_page"><span class="glyphicon glyphicon-log-in"></span>&nbsp;<fmt:message key="general.anchor.sign_in"/></a></li>
-    	</c:when>
-    	<c:otherwise>
-    	<li class="dropdown">
-        <a class="dropdown-toggle" data-toggle="dropdown" href="">
-        <span class="glyphicon glyphicon-user"></span>&nbsp;
-        	<c:choose>
-        		<c:when test="${empty personName}">
-        			<fmt:message key="navbar_jspf.anchor.account"/>
-        		</c:when>
-        		<c:otherwise>
-        			<c:out value = "${personName}"/>
-        		</c:otherwise>
-        	</c:choose>
-        <span class="caret"></span></a>
-        <ul class="dropdown-menu">       
-        <li class ="<c:out value = "${home}"/>"><a href="?command=home_page"><fmt:message key="general.anchor.home"/></a></li>
-        <li class ="<c:out value = "${profile}"/>"><a href="?command=profile_page"><fmt:message key="general.anchor.profile"/></a></li>
-        <li class ="<c:out value = "${trip}"/>"><a href="?command=new_trip_page"><fmt:message key="new_trip_jsp.anchor.header"/></a></li>
-        <li class ="<c:out value = "${trips}"/>"><a href="?command=trips_page"><fmt:message key="general.anchor.trips"/></a></li>
-        <li role="separator" class="divider"></li>
-        <li><a href="?command=sign_out"><fmt:message key="navbar_jspf.anchor.sign_out"/></a></li>
-        </ul>
-        </li>
-    	</c:otherwise>
-    </c:choose>
-    	      
-    <li class="dropdown">
-        <a class="dropdown-toggle" data-toggle="dropdown" href="">
-        <span class="glyphicon glyphicon-globe"></span>&nbsp;
-        <fmt:message key="navbar_jspf.anchor.lang_short"/>	
-        <span class="caret"></span>
-        </a>
-        <ul class="dropdown-menu">
-            <c:set var = "lang" value="${empty locale ? defaultLocale : locale}"/>
-            
-            <c:set var="tempParams" value = "${requestScope['javax.servlet.forward.query_string']}"/>
-			<c:set var="params" value = "${tempParams.replaceAll('[&?]locale=\\\\w+', '')}"/>                 
-            <c:set var="requestPath" value="${requestScope['javax.servlet.forward.request_uri']}"/>
-            <c:set var="pageUrl" value="${requestPath}${ not empty params ? '?'+=params+='&locale=' : '?locale='}"/>
-        	
-        	<c:forEach var="localeName" items="${locales}">
-				<li class="${lang == localeName ? 'active': ''}"><a href="<c:out value="${pageUrl+=localeName}"/>"><fmt:message key="navbar_jspf.anchor.lang_${localeName}"/></a></li>							
-			</c:forEach>
-        </ul>  
-    </li>
-  	</ul>
-  </div>
+	<div class="container">
+		<div class="navbar-header">
+			<a class="navbar-brand" href="?command=home_page">Taxi Service</a>
+		</div>
+		<ul class="nav navbar-nav navbar-right">
+			<c:choose>
+				<c:when test="${empty personId}">
+					<li><a href="?command=sign_up_page"><span
+							class="glyphicon glyphicon-user"></span>&nbsp;<fmt:message
+								key="general.anchor.sign_up" /></a></li>
+					<li><a href="?command=sign_in_page"><span
+							class="glyphicon glyphicon-log-in"></span>&nbsp;<fmt:message
+								key="general.anchor.sign_in" /></a></li>
+				</c:when>
+				<c:otherwise>
+					<li class="dropdown"><a class="dropdown-toggle"
+						data-toggle="dropdown" href=""> <span
+							class="glyphicon glyphicon-user"></span>&nbsp; <c:choose>
+								<c:when test="${empty personName}">
+									<fmt:message key="navbar_jspf.anchor.account" />
+								</c:when>
+								<c:otherwise>
+									<c:out value="${personName}" />
+								</c:otherwise>
+							</c:choose> <span class="caret"></span></a>
+						<ul class="dropdown-menu">
+							<li class="<c:out value = "${home}"/>"><a
+								href="?command=home_page"> <fmt:message
+										key="general.anchor.home" />
+							</a></li>
+
+							<li class="<c:out value = "${profile}"/>"><a
+								href="?command=profile_page"> <fmt:message
+										key="general.anchor.profile" />
+							</a></li>
+							<li class="<c:out value = "${trip}"/>"><a
+								href="?command=new_trip_page"> <fmt:message
+										key="new_trip_jsp.anchor.header" />
+							</a></li>
+							<li class="<c:out value = "${trips}"/>"><a
+								href="?command=trips_page"> <fmt:message
+										key="general.anchor.trips" />
+							</a></li>
+							<li role="separator" class="divider"></li>
+							<li><a href="?command=sign_out"> <fmt:message
+										key="navbar_jspf.anchor.sign_out" />
+							</a></li>
+						</ul></li>
+				</c:otherwise>
+			</c:choose>
+
+			<li class="dropdown"><a class="dropdown-toggle"
+				data-toggle="dropdown" href=""> <span
+					class="glyphicon glyphicon-globe"></span>&nbsp; <fmt:message
+						key="navbar_jspf.anchor.lang_short" /> <span class="caret"></span>
+			</a>
+				<ul class="dropdown-menu">
+					<c:set var="lang" value="${empty locale ? defaultLocale : locale}" />
+
+					<c:set var="tempParams"
+						value="${requestScope['javax.servlet.forward.query_string']}" />
+					<c:set var="params"
+						value="${tempParams.replaceAll('&*locale=\\\\w+', '')}" />
+					<c:set var="requestPath"
+						value="${requestScope['javax.servlet.forward.request_uri']}" />
+					<c:set var="pageUrl"
+						value="${requestPath}${ not empty params ? '?'+=params+='&locale=' : '?locale='}" />
+
+					<c:forEach var="localeName" items="${locales}">
+						<li class="${lang == localeName ? 'active': ''}"><a
+							href="<c:out value="${pageUrl+=localeName}"/>"> <fmt:message
+									key="navbar_jspf.anchor.lang_${localeName}" />
+						</a></li>
+					</c:forEach>
+				</ul></li>
+		</ul>
+	</div>
 </nav>
- 
+
+

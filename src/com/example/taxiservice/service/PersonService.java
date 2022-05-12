@@ -18,123 +18,123 @@ import com.example.taxiservice.model.Person;
  */
 @Singleton
 public class PersonService {
-	
+
 	private static final String PHONE_PATTERN = "[0-9]{10}";
 	private static final String TEXT_PATTERN = "[A-Z][a-z]+|[А-Я][а-я]+";
 	private static final String PASSWORD_PATTERN = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$";
 	private static final Logger LOG = LoggerFactory.getLogger(PersonService.class);
-	
+
 	@InjectByType
 	private PersonDao personDao;
-	
+
 	public PersonService() {
 		LOG.info("PersonService initialized");
-	}	
-	
+	}
+
 	public Person find(String phone) {
 		return personDao.find(phone);
 	}
-	
+
 	public Person find(Long id) {
 		return personDao.find(id);
 	}
-	
+
 	public boolean insert(Person person) {
 		return personDao.insert(person);
 	}
-	
+
 	public boolean update(Person person) {
 		boolean result = false;
-		
-		if(person.getPassword().isEmpty()) {
+
+		if (person.getPassword().isEmpty()) {
 			Person oldPerson = personDao.find(person.getId());
 			person.setPassword(oldPerson.getPassword());
 			result = personDao.update(person);
-		}else {
+		} else {
 			result = personDao.update(person);
 		}
-		
+
 		return result;
-		
+
 	}
-	
+
 	public static boolean validateText(String text) {
 		boolean result = false;
-		
-		if(text != null) {
+
+		if (text != null) {
 			Pattern pattern = Pattern.compile(TEXT_PATTERN);
 			Matcher matcher = pattern.matcher(text);
-			
-			if(matcher.matches()) {
+
+			if (matcher.matches()) {
 				result = true;
 			}
 		}
-		
+
 		return result;
 	}
-	
+
 	public static boolean validatePhone(String phone) {
 		boolean result = false;
-		
-		if(phone != null) {
+
+		if (phone != null) {
 			Pattern pattern = Pattern.compile(PHONE_PATTERN);
 			Matcher matcher = pattern.matcher(phone);
 
-			if(matcher.matches()) {
+			if (matcher.matches()) {
 				result = true;
 			}
 		}
-						
-		return result;	
+
+		return result;
 	}
-	
+
 	public static boolean validatePassword(String password) {
 		boolean result = false;
 
-		if(password != null) {
+		if (password != null) {
 			Pattern pattern = Pattern.compile(PASSWORD_PATTERN);
 			Matcher matcher = pattern.matcher(password);
-			
-			if(matcher.matches()) {
+
+			if (matcher.matches()) {
 				result = true;
 			}
 
 		}
-		
+
 		return result;
 	}
-	
+
 	public static boolean validatePasswordConfirm(String password, String passwordConfirm) {
 		boolean result = false;
 
-		if(password != null && password.equals(passwordConfirm)) {
+		if (password != null && password.equals(passwordConfirm)) {
 			result = true;
 		}
-		
-		return result;	
+
+		return result;
 	}
-	
+
 	public static String hashPassword(String password) {
 		String result = null;
-		
-		if(password != null) {
+
+		if (password != null) {
 			try {
 				MessageDigest md = MessageDigest.getInstance("SHA-256");
-	            byte[] bytes = md.digest(password.getBytes());
-	            StringBuilder sb = new StringBuilder();
-	            
-	            for (int i = 0; i < bytes.length; i++) {
-	                sb.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
-	            }
-	            
-	            result = sb.toString();
-	            
-	        } catch (NoSuchAlgorithmException e) {
-	            LOG.error(e.getMessage());
-	        }
+				byte[] bytes = md.digest(password.getBytes());
+				StringBuilder sb = new StringBuilder();
+
+				for (int i = 0; i < bytes.length; i++) {
+					sb.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
+				}
+
+				result = sb.toString();
+
+			} catch (NoSuchAlgorithmException e) {
+				LOG.error(e.getMessage());
+			}
 		}
-		
-		return result;	
-	}	
+
+		return result;
+	}
 
 }

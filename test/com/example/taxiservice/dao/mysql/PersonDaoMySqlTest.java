@@ -37,10 +37,10 @@ public class PersonDaoMySqlTest {
 	private PreparedStatement statement;
 	@Mock
 	private ResultSet set;
-	
+
 	@InjectMocks
 	private PersonDaoMySql personDaoMySql;
-	
+
 	private Person person;
 
 	@Before
@@ -51,15 +51,15 @@ public class PersonDaoMySqlTest {
 		person.setPassword("client3");
 		person.setName("Tom");
 		person.setSurname("Smith");
-		
+
 		when(dataSource.getConnection()).thenReturn(connection);
-		
+
 		when(connection.prepareStatement(anyString())).thenReturn(statement);
 		when(connection.prepareStatement(anyString(), anyInt())).thenReturn(statement);
-		
+
 		when(statement.executeQuery()).thenReturn(set);
 		when(statement.getGeneratedKeys()).thenReturn(set);
-		
+
 		when(set.next()).thenReturn(Boolean.TRUE, Boolean.FALSE);
 		when(set.getLong(Fields.PERSON__ID)).thenReturn(person.getId());
 		when(set.getString(Fields.PERSON__PHONE)).thenReturn(person.getPhone());
@@ -67,18 +67,18 @@ public class PersonDaoMySqlTest {
 		when(set.getString(Fields.PERSON__NAME)).thenReturn(person.getName());
 		when(set.getString(Fields.PERSON__SURNAME)).thenReturn(person.getSurname());
 		when(set.getInt(Fields.PERSON__ROLE_ID)).thenReturn(person.getRoleId());
-		
+
 	}
-	
+
 	@Test
 	public void testFindById() {
 		Person result = personDaoMySql.find(4L);
-		assertEquals(person, result);	
+		assertEquals(person, result);
 	}
 
 	@Test
 	public void testInsert() throws SQLException {
-		
+
 		personDaoMySql.insert(person);
 
 		// verify and assert
@@ -90,12 +90,12 @@ public class PersonDaoMySqlTest {
 		verify(connection, times(1)).commit();
 
 	}
-	
+
 	@Test
 	public void testUpdate() throws SQLException {
-		
+
 		personDaoMySql.update(person);
-		
+
 		// verify and assert
 		verify(connection, times(1)).prepareStatement(anyString());
 		verify(statement, times(4)).setString(anyInt(), anyString());

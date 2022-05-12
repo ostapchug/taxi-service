@@ -1,5 +1,8 @@
 <footer class="footer">
-<div class="container text-center">
-  <p>&#169;&nbsp;2022&nbsp;Taxi Service&nbsp;&#174;&nbsp;<fmt:message key="footer_jspf.anchor.copyright"/></p>
-</div>
+	<div class="container text-center">
+		<p>
+			&#169;&nbsp;2022&nbsp;Taxi Service&nbsp;&#174;&nbsp;
+			<fmt:message key="footer_jspf.anchor.copyright" />
+		</p>
+	</div>
 </footer>

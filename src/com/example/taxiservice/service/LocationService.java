@@ -16,40 +16,40 @@ import com.example.taxiservice.model.Location;
  */
 @Singleton
 public class LocationService {
-	
+
 	private static final Logger LOG = LoggerFactory.getLogger(LocationService.class);
-	
+
 	@InjectByType
 	private LocationDao locationDao;
 
 	public LocationService() {
 		LOG.info("LocationService initialized");
 	}
-	
+
 	public Location find(Long id) {
 		return locationDao.find(id);
 	}
-	
+
 	public Location find(Long id, String lang) {
 		Location result = locationDao.find(id);
-		
-		if(lang != null) {
+
+		if (lang != null) {
 			result = locationDao.find(id, lang);
 		}
-		
+
 		return result;
 	}
-	
-	public List<Location> findAll(String lang){
+
+	public List<Location> findAll(String lang) {
 		List<Location> result = locationDao.findAll();
-		
-		if(lang != null) {
+
+		if (lang != null) {
 			result = locationDao.findAll(lang);
 		}
-		
+
 		return result;
 	}
-	
+
 	public BigDecimal findDistance(Long originId, Long destinationId) {
 		Location origin = find(originId);
 		Location destination = find(destinationId);

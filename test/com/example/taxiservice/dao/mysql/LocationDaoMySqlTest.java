@@ -29,7 +29,7 @@ import com.example.taxiservice.model.Location;
 
 @RunWith(MockitoJUnitRunner.class)
 public class LocationDaoMySqlTest {
-	
+
 	@Mock
 	private DataSource dataSource;
 	@Mock
@@ -38,10 +38,10 @@ public class LocationDaoMySqlTest {
 	private PreparedStatement statement;
 	@Mock
 	private ResultSet set;
-	
+
 	@InjectMocks
 	private LocationDaoMySql locationDaoMySql;
-	
+
 	private Location location;
 
 	@Before
@@ -52,33 +52,33 @@ public class LocationDaoMySqlTest {
 		location.setStreetNumber("36");
 		location.setLatitude(new BigDecimal(48.925541084296924));
 		location.setLongitude(new BigDecimal(24.737374909778257));
-		
+
 		when(dataSource.getConnection()).thenReturn(connection);
-		
+
 		when(connection.prepareStatement(anyString())).thenReturn(statement);
 		when(connection.prepareStatement(anyString(), anyInt())).thenReturn(statement);
-		
+
 		when(statement.executeQuery()).thenReturn(set);
 		when(statement.getGeneratedKeys()).thenReturn(set);
-		
+
 		when(set.next()).thenReturn(Boolean.TRUE, Boolean.FALSE);
 		when(set.getLong(Fields.LOCATION__ID)).thenReturn(location.getId());
 		when(set.getString(Fields.LOCATION__STREET_NAME)).thenReturn(location.getStreetName());
 		when(set.getString(Fields.LOCATION__STREET_NUMBER)).thenReturn(location.getStreetNumber());
 		when(set.getBigDecimal(Fields.LOCATION__LATITUDE)).thenReturn(location.getLatitude());
 		when(set.getBigDecimal(Fields.LOCATION__LONGITUDE)).thenReturn(location.getLongitude());
-		
+
 	}
 
 	@Test
 	public void testFindById() {
 		Location result = locationDaoMySql.find(1L);
-		assertEquals(location, result);	
+		assertEquals(location, result);
 	}
-	
+
 	@Test
 	public void testInsert() throws SQLException {
-		
+
 		locationDaoMySql.insert(location);
 
 		// verify and assert
@@ -91,10 +91,10 @@ public class LocationDaoMySqlTest {
 		verify(connection, times(1)).commit();
 
 	}
-	
+
 	@Test
 	public void testUpdate() throws SQLException {
-		
+
 		locationDaoMySql.update(location);
 
 		// verify and assert

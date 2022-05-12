@@ -8,24 +8,24 @@ import java.math.BigDecimal;
 public class Location extends Entity {
 
 	private static final long serialVersionUID = 3768408533435589862L;
-	
+
 	private String streetName;
 	private String streetNumber;
 	private BigDecimal latitude;
 	private BigDecimal longitude;
-	
+
 	public String getStreetName() {
 		return streetName;
 	}
-	
+
 	public void setStreetName(String streetName) {
 		this.streetName = streetName;
 	}
-	
+
 	public String getStreetNumber() {
 		return streetNumber;
 	}
-	
+
 	public void setStreetNumber(String streetNumber) {
 		this.streetNumber = streetNumber;
 	}
@@ -93,5 +93,5 @@ public class Location extends Entity {
 			return false;
 		return true;
 	}
-		
+
 }

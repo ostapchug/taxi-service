@@ -24,8 +24,8 @@ import com.example.taxiservice.model.Trip;
  * Data access object for Trip entity.
  */
 @Singleton
-public class TripDaoMySql extends AbstractDao<Trip> implements TripDao{
-	
+public class TripDaoMySql extends AbstractDao<Trip> implements TripDao {
+
 	private static final String SQL__FIND_TRIP_BY_ID = "SELECT * FROM trip WHERE t_id=?";
 	private static final String SQL__INSERT_TRIP = "INSERT INTO trip (t_person, t_origin, t_destination, t_distance, t_bill) VALUES (?, ?, ?, ?, ?)";
 	private static final String SQL__INSERT_TRIP_CAR = "INSERT INTO m2m_trip_car (t_id, c_id) VALUES (?, ?)";
@@ -40,7 +40,7 @@ public class TripDaoMySql extends AbstractDao<Trip> implements TripDao{
 	private static final String SQL__SELECT_COUNT_TRIPS_BY_PERSON_AND_DATE = "SELECT COUNT(*) FROM trip WHERE t_person=? AND t_date BETWEEN ? AND ?";
 	private static final String SQL__UPDATE_TRIP_STATUS = "UPDATE trip SET t_status=(SELECT ts_id FROM trip_status WHERE ts_name=?) WHERE t_id = ?";
 	private static final String SQL__SELECT_TRIP_TOTAL_BILL = "SELECT SUM(t_bill) FROM trip WHERE t_person = ? AND t_status = 2";
-	
+
 	private static final Logger LOG = LoggerFactory.getLogger(TripDaoMySql.class);
 
 	public TripDaoMySql() {
@@ -53,27 +53,27 @@ public class TripDaoMySql extends AbstractDao<Trip> implements TripDao{
 		Connection connection = null;
 		PreparedStatement statement = null;
 		ResultSet set = null;
-		
+
 		try {
 			connection = getConnection();
 			statement = connection.prepareStatement(SQL__FIND_TRIP_BY_ID);
 			statement.setLong(1, id);
 			set = statement.executeQuery();
-			
+
 			while (set.next()) {
-				trip = mapRow(set);						
+				trip = mapRow(set);
 			}
-			
+
 			commit(connection);
-			
+
 		} catch (SQLException e) {
 			rollback(connection);
 			LOG.error(e.getMessage());
 		} finally {
-			
-			close(set, statement, connection);			
+
+			close(set, statement, connection);
 		}
-		
+
 		return trip;
 	}
 
@@ -83,7 +83,7 @@ public class TripDaoMySql extends AbstractDao<Trip> implements TripDao{
 		Connection connection = null;
 		PreparedStatement statement = null;
 		ResultSet set = null;
-		
+
 		try {
 			connection = getConnection();
 			statement = connection.prepareStatement(SQL__INSERT_TRIP, Statement.RETURN_GENERATED_KEYS);
@@ -92,27 +92,27 @@ public class TripDaoMySql extends AbstractDao<Trip> implements TripDao{
 			statement.setLong(3, trip.getDestinationId());
 			statement.setBigDecimal(4, trip.getDistance());
 			statement.setBigDecimal(5, trip.getBill());
-			
+
 			statement.executeUpdate();
 			set = statement.getGeneratedKeys();
-			
+
 			while (set.next()) {
-				trip.setId(set.getLong(1));							
+				trip.setId(set.getLong(1));
 			}
-			
+
 			commit(connection);
 			result = true;
-			
+
 		} catch (SQLException e) {
 			rollback(connection);
 			LOG.error(e.getMessage());
 		} finally {
-			close(set, statement, connection);	
+			close(set, statement, connection);
 		}
-		
+
 		return result;
 	}
-	
+
 	@Override
 	public boolean insert(Trip trip, Car... cars) {
 		boolean result = false;
@@ -120,7 +120,7 @@ public class TripDaoMySql extends AbstractDao<Trip> implements TripDao{
 		PreparedStatement statement1 = null;
 		PreparedStatement statement2 = null;
 		ResultSet set = null;
-		
+
 		try {
 			connection = getConnection();
 			statement1 = connection.prepareStatement(SQL__INSERT_TRIP, Statement.RETURN_GENERATED_KEYS);
@@ -129,21 +129,21 @@ public class TripDaoMySql extends AbstractDao<Trip> implements TripDao{
 			statement1.setLong(3, trip.getDestinationId());
 			statement1.setBigDecimal(4, trip.getDistance());
 			statement1.setBigDecimal(5, trip.getBill());
-			
+
 			statement1.executeUpdate();
 			set = statement1.getGeneratedKeys();
-			
+
 			while (set.next()) {
-				trip.setId(set.getLong(1));							
+				trip.setId(set.getLong(1));
 			}
-			
+
 			statement2 = connection.prepareStatement(SQL__INSERT_TRIP_CAR);
-			for(Car car : cars) {
+			for (Car car : cars) {
 				statement2.setLong(1, trip.getId());
 				statement2.setLong(2, car.getId());
 				statement2.executeUpdate();
 			}
-			
+
 			commit(connection);
 			result = true;
 		} catch (SQLException e) {
@@ -151,18 +151,18 @@ public class TripDaoMySql extends AbstractDao<Trip> implements TripDao{
 			LOG.error(e.getMessage());
 		} finally {
 			close(statement2);
-			close(set, statement1, connection);	
+			close(set, statement1, connection);
 		}
-		
+
 		return result;
 	}
-	
+
 	@Override
 	public boolean update(Trip trip) {
 		boolean result = false;
 		Connection connection = null;
 		PreparedStatement statement = null;
-		
+
 		try {
 			connection = getConnection();
 			statement = connection.prepareStatement(SQL__UPDATE_TRIP);
@@ -173,17 +173,17 @@ public class TripDaoMySql extends AbstractDao<Trip> implements TripDao{
 			statement.setBigDecimal(6, trip.getBill());
 			statement.setInt(7, trip.getStatusId());
 			statement.executeUpdate();
-			
+
 			commit(connection);
 			result = true;
-			
-		}catch (SQLException e) {
+
+		} catch (SQLException e) {
 			rollback(connection);
 			LOG.error(e.getMessage());
 		} finally {
-			close(statement, connection);	
+			close(statement, connection);
 		}
-		
+
 		return result;
 	}
 
@@ -192,45 +192,45 @@ public class TripDaoMySql extends AbstractDao<Trip> implements TripDao{
 		List<Trip> result = new ArrayList<Trip>();
 		Trip trip = null;
 		String sql = String.format(SQL__SELECT_ALL_TRIPS, sorting);
-		
+
 		Connection connection = null;
 		PreparedStatement statement = null;
 		ResultSet set = null;
-		
+
 		try {
 			connection = getConnection();
 			statement = connection.prepareStatement(sql);
 			statement.setInt(1, offset);
 			statement.setInt(2, count);
 			set = statement.executeQuery();
-			
+
 			while (set.next()) {
 				trip = mapRow(set);
 				result.add(trip);
 			}
-			
+
 			commit(connection);
-			
+
 		} catch (SQLException e) {
 			rollback(connection);
 			LOG.error(e.getMessage());
 		} finally {
-			close(set, statement, connection);			
+			close(set, statement, connection);
 		}
-		
+
 		return result;
 	}
-	
+
 	@Override
 	public List<Trip> findAllByDate(Timestamp[] dateRange, int offset, int count, String sorting) {
 		List<Trip> result = new ArrayList<Trip>();
 		Trip trip = null;
 		String sql = String.format(SQL__SELECT_ALL_TRIPS_BY_DATE, sorting);
-		
+
 		Connection connection = null;
 		PreparedStatement statement = null;
 		ResultSet set = null;
-		
+
 		try {
 			connection = getConnection();
 			statement = connection.prepareStatement(sql);
@@ -239,34 +239,34 @@ public class TripDaoMySql extends AbstractDao<Trip> implements TripDao{
 			statement.setInt(3, offset);
 			statement.setInt(4, count);
 			set = statement.executeQuery();
-			
+
 			while (set.next()) {
 				trip = mapRow(set);
 				result.add(trip);
 			}
-			
+
 			commit(connection);
-			
+
 		} catch (SQLException e) {
 			rollback(connection);
 			LOG.error(e.getMessage());
 		} finally {
-			close(set, statement, connection);			
+			close(set, statement, connection);
 		}
-		
+
 		return result;
 	}
-	
+
 	@Override
 	public List<Trip> findAllByPersonId(Long personId, int offset, int count, String sorting) {
 		List<Trip> result = new ArrayList<Trip>();
 		Trip trip = null;
 		String sql = String.format(SQL__SELECT_ALL_TRIPS_BY_PERSON, sorting);
-		
+
 		Connection connection = null;
 		PreparedStatement statement = null;
 		ResultSet set = null;
-		
+
 		try {
 			connection = getConnection();
 			statement = connection.prepareStatement(sql);
@@ -274,34 +274,35 @@ public class TripDaoMySql extends AbstractDao<Trip> implements TripDao{
 			statement.setInt(2, offset);
 			statement.setInt(3, count);
 			set = statement.executeQuery();
-			
+
 			while (set.next()) {
 				trip = mapRow(set);
 				result.add(trip);
 			}
-			
+
 			commit(connection);
-			
+
 		} catch (SQLException e) {
 			rollback(connection);
 			LOG.error(e.getMessage());
-		} finally {	
-			close(set, statement, connection);			
+		} finally {
+			close(set, statement, connection);
 		}
-		
+
 		return result;
 	}
-	
+
 	@Override
-	public List<Trip> findAllByPersonIdAndDate(Long personId, Timestamp [] dateRange, int offset, int count, String sorting) {
+	public List<Trip> findAllByPersonIdAndDate(Long personId, Timestamp[] dateRange, int offset, int count,
+			String sorting) {
 		List<Trip> result = new ArrayList<Trip>();
 		Trip trip = null;
 		String sql = String.format(SQL__SELECT_ALL_TRIPS_BY_PERSON_AND_DATE, sorting);
-		
+
 		Connection connection = null;
 		PreparedStatement statement = null;
 		ResultSet set = null;
-		
+
 		try {
 			connection = getConnection();
 			statement = connection.prepareStatement(sql);
@@ -311,62 +312,62 @@ public class TripDaoMySql extends AbstractDao<Trip> implements TripDao{
 			statement.setInt(4, offset);
 			statement.setInt(5, count);
 			set = statement.executeQuery();
-			
+
 			while (set.next()) {
 				trip = mapRow(set);
 				result.add(trip);
 			}
-			
+
 			commit(connection);
-			
+
 		} catch (SQLException e) {
 			rollback(connection);
 			LOG.error(e.getMessage());
 		} finally {
-			close(set, statement, connection);			
+			close(set, statement, connection);
 		}
-		
+
 		return result;
 	}
-	
+
 	@Override
 	public Integer getCount() {
 		Integer result = null;
-		
+
 		Connection connection = null;
 		PreparedStatement statement = null;
 		ResultSet set = null;
-		
+
 		try {
 			connection = getConnection();
 			statement = connection.prepareStatement(SQL__SELECT_COUNT_TRIPS);
 
 			set = statement.executeQuery();
-			
+
 			while (set.next()) {
 				result = set.getInt(1);
 			}
-			
+
 			commit(connection);
-			
+
 		} catch (SQLException e) {
 			rollback(connection);
 			LOG.error(e.getMessage());
-		} finally {	
-			close(set, statement, connection);			
+		} finally {
+			close(set, statement, connection);
 		}
-		
+
 		return result;
 	}
-	
+
 	@Override
 	public Integer getCountByDate(Timestamp[] dateRange) {
 		Integer result = null;
-		
+
 		Connection connection = null;
 		PreparedStatement statement = null;
 		ResultSet set = null;
-		
+
 		try {
 			connection = getConnection();
 			statement = connection.prepareStatement(SQL__SELECT_COUNT_TRIPS_BY_DATE);
@@ -374,62 +375,62 @@ public class TripDaoMySql extends AbstractDao<Trip> implements TripDao{
 			statement.setTimestamp(2, dateRange[1]);
 
 			set = statement.executeQuery();
-			
+
 			while (set.next()) {
 				result = set.getInt(1);
 			}
-			
+
 			commit(connection);
-			
+
 		} catch (SQLException e) {
 			rollback(connection);
 			LOG.error(e.getMessage());
-		} finally {	
-			close(set, statement, connection);			
+		} finally {
+			close(set, statement, connection);
 		}
-		
+
 		return result;
 	}
-	
+
 	@Override
 	public Integer getCountByPersonId(Long personId) {
 		Integer result = null;
-		
+
 		Connection connection = null;
 		PreparedStatement statement = null;
 		ResultSet set = null;
-		
+
 		try {
 			connection = getConnection();
 			statement = connection.prepareStatement(SQL__SELECT_COUNT_TRIPS_BY_PERSON);
 			statement.setLong(1, personId);
 
 			set = statement.executeQuery();
-			
+
 			while (set.next()) {
 				result = set.getInt(1);
 			}
-			
+
 			commit(connection);
-			
+
 		} catch (SQLException e) {
 			rollback(connection);
 			LOG.error(e.getMessage());
-		} finally {	
-			close(set, statement, connection);			
+		} finally {
+			close(set, statement, connection);
 		}
-		
+
 		return result;
 	}
 
 	@Override
-	public Integer getCountByPersonIdAndDate(Long personId, Timestamp [] dateRange) {
+	public Integer getCountByPersonIdAndDate(Long personId, Timestamp[] dateRange) {
 		Integer result = null;
-		
+
 		Connection connection = null;
 		PreparedStatement statement = null;
 		ResultSet set = null;
-		
+
 		try {
 			connection = getConnection();
 			statement = connection.prepareStatement(SQL__SELECT_COUNT_TRIPS_BY_PERSON_AND_DATE);
@@ -438,20 +439,20 @@ public class TripDaoMySql extends AbstractDao<Trip> implements TripDao{
 			statement.setTimestamp(3, dateRange[1]);
 
 			set = statement.executeQuery();
-			
+
 			while (set.next()) {
 				result = set.getInt(1);
 			}
-			
+
 			commit(connection);
-			
+
 		} catch (SQLException e) {
 			rollback(connection);
 			LOG.error(e.getMessage());
-		} finally {	
-			close(set, statement, connection);			
+		} finally {
+			close(set, statement, connection);
 		}
-		
+
 		return result;
 	}
 
@@ -460,65 +461,65 @@ public class TripDaoMySql extends AbstractDao<Trip> implements TripDao{
 		boolean result = false;
 		Connection connection = null;
 		PreparedStatement statement = null;
-		
+
 		try {
 			connection = getConnection();
 			statement = connection.prepareStatement(SQL__UPDATE_TRIP_STATUS);
 			statement.setString(1, status);
 			statement.setLong(2, trip.getId());
 			statement.executeUpdate();
-			
+
 			commit(connection);
 			result = true;
-			
-		}catch (SQLException e) {
+
+		} catch (SQLException e) {
 			rollback(connection);
 			LOG.error(e.getMessage());
 		} finally {
-			close(statement, connection);	
+			close(statement, connection);
 		}
-		
+
 		return result;
-		
+
 	}
-	
+
 	@Override
 	public BigDecimal getTotalBill(Long personId) {
 		BigDecimal result = null;
-		
+
 		Connection connection = null;
 		PreparedStatement statement = null;
 		ResultSet set = null;
-		
+
 		try {
 			connection = getConnection();
 			statement = connection.prepareStatement(SQL__SELECT_TRIP_TOTAL_BILL);
 			statement.setLong(1, personId);
 			set = statement.executeQuery();
-			
+
 			while (set.next()) {
 				result = set.getBigDecimal(1);
 			}
-			
+
 			commit(connection);
-			
+
 		} catch (SQLException e) {
 			rollback(connection);
 			LOG.error(e.getMessage());
-		} finally {	
-			close(set, statement, connection);			
+		} finally {
+			close(set, statement, connection);
 		}
-		
+
 		return result;
 	}
-	
+
 	@Override
 	protected Trip mapRow(ResultSet set) {
 		Trip trip = null;
-		
+
 		try {
 			trip = new Trip();
-			
+
 			trip.setId(set.getLong(Fields.TRIP__ID));
 			trip.setPersonId(set.getLong(Fields.TRIP__PERSON_ID));
 			trip.setOriginId(set.getLong(Fields.TRIP__ORIGIN_ID));
@@ -527,10 +528,10 @@ public class TripDaoMySql extends AbstractDao<Trip> implements TripDao{
 			trip.setDate(set.getTimestamp(Fields.TRIP__DATE));
 			trip.setBill(set.getBigDecimal(Fields.TRIP__BILL));
 			trip.setStatusId(set.getInt(Fields.TRIP__STATUS_ID));
-            
-        } catch (SQLException e) {
-        	LOG.error(e.getMessage());
-        }
+
+		} catch (SQLException e) {
+			LOG.error(e.getMessage());
+		}
 		return trip;
 	}
 

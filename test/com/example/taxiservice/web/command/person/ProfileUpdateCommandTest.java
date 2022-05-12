@@ -23,24 +23,27 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import com.example.taxiservice.model.Person;
 import com.example.taxiservice.service.PersonService;
+import com.example.taxiservice.web.Attribute;
+import com.example.taxiservice.web.Error;
 import com.example.taxiservice.web.Page;
+import com.example.taxiservice.web.Parameter;
 import com.example.taxiservice.web.Path;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ProfileUpdateCommandTest {
-	
-	@Mock 
+
+	@Mock
 	private HttpServletRequest request;
-	@Mock 
+	@Mock
 	private HttpServletResponse response;
 	@Mock
 	private HttpSession session;
 	@Mock
 	private PersonService personService;
-	
+
 	@InjectMocks
 	private ProfileUpdateCommand profileUpdateCommand;
-	
+
 	private Person person;
 	private String phone = "0123456781";
 	private String validPassword = "Client#1", invalidPassword = "client#1";
@@ -56,135 +59,145 @@ public class ProfileUpdateCommandTest {
 		person.setName(validName);
 		person.setSurname(validSurname);
 		person.setRoleId(1);
-		
+
 		when(request.getMethod()).thenReturn("POST");
 		when(request.getSession(false)).thenReturn(session);
-		when(session.getAttribute("personId")).thenReturn(person.getId());
+		when(session.getAttribute(Attribute.PERSON__ID)).thenReturn(person.getId());
 	}
 
 	@Test
 	public void testProfileUpdate() throws IOException, ServletException {
-		when(request.getParameter("phone")).thenReturn(phone);
-		when(request.getParameter("password")).thenReturn(validPassword);
-		when(request.getParameter("passwordConfirm")).thenReturn(validPassword);
-		when(request.getParameter("name")).thenReturn(validName);
-		when(request.getParameter("surname")).thenReturn(validSurname);
+		when(request.getParameter(Parameter.PERSON__PHONE)).thenReturn(phone);
+		when(request.getParameter(Parameter.PERSON__PASSWORD)).thenReturn(validPassword);
+		when(request.getParameter(Parameter.PERSON__PASSWORD_CONFIRM)).thenReturn(validPassword);
+		when(request.getParameter(Parameter.PERSON__NAME)).thenReturn(validName);
+		when(request.getParameter(Parameter.PERSON__SURNAME)).thenReturn(validSurname);
 		when(personService.find(person.getId())).thenReturn(person);
 		when(personService.find(person.getPhone())).thenReturn(person);
 		when(personService.update(person)).thenReturn(true);
-		
+
 		Page result = profileUpdateCommand.execute(request, response);
-		
+
 		verify(request, times(1)).getSession(false);
 		verify(session, times(3)).setAttribute(anyString(), anyString());
-		
-		assertEquals(new Page(Path.COMMAND__PROFILE_PAGE, true), result);	
+
+		assertEquals(new Page(Path.COMMAND__PROFILE_PAGE, true), result);
 	}
-	
+
 	@Test
 	public void testProfileUpdateFail() throws IOException, ServletException {
-		when(request.getParameter("phone")).thenReturn(phone);
-		when(request.getParameter("password")).thenReturn(validPassword);
-		when(request.getParameter("passwordConfirm")).thenReturn(validPassword);
-		when(request.getParameter("name")).thenReturn(validName);
-		when(request.getParameter("surname")).thenReturn(validSurname);
+		when(request.getParameter(Parameter.PERSON__PHONE)).thenReturn(phone);
+		when(request.getParameter(Parameter.PERSON__PASSWORD)).thenReturn(validPassword);
+		when(request.getParameter(Parameter.PERSON__PASSWORD_CONFIRM)).thenReturn(validPassword);
+		when(request.getParameter(Parameter.PERSON__NAME)).thenReturn(validName);
+		when(request.getParameter(Parameter.PERSON__SURNAME)).thenReturn(validSurname);
 		when(personService.find(person.getId())).thenReturn(person);
 		when(personService.find(person.getPhone())).thenReturn(person);
 		when(personService.update(person)).thenReturn(false);
-		
+
 		Page result = profileUpdateCommand.execute(request, response);
-		
+
 		verify(request, times(1)).getSession(false);
 		verify(session, never()).setAttribute(anyString(), anyString());
-		
-		assertEquals(new Page(Path.COMMAND__PROFILE_UPDATE_PAGE + "&error=profile_update", true), result);	
+
+		assertEquals(new Page(Path.COMMAND__PROFILE_UPDATE_PAGE + Parameter.ERROR__QUERY + Error.PROFILE__UPDATE, true),
+				result);
 	}
-	
+
 	@Test
 	public void testProfileUpdateFailPhoneExist() throws IOException, ServletException {
-		when(request.getParameter("phone")).thenReturn(phone);
-		when(request.getParameter("password")).thenReturn(validPassword);
-		when(request.getParameter("passwordConfirm")).thenReturn(validPassword);
-		when(request.getParameter("name")).thenReturn(validName);
-		when(request.getParameter("surname")).thenReturn(validSurname);
+		when(request.getParameter(Parameter.PERSON__PHONE)).thenReturn(phone);
+		when(request.getParameter(Parameter.PERSON__PASSWORD)).thenReturn(validPassword);
+		when(request.getParameter(Parameter.PERSON__PASSWORD_CONFIRM)).thenReturn(validPassword);
+		when(request.getParameter(Parameter.PERSON__NAME)).thenReturn(validName);
+		when(request.getParameter(Parameter.PERSON__SURNAME)).thenReturn(validSurname);
 		when(personService.find(person.getId())).thenReturn(person);
 		when(personService.find(person.getPhone())).thenReturn(new Person());
-		
+
 		Page result = profileUpdateCommand.execute(request, response);
-		
+
 		verify(request, times(1)).getSession(false);
 		verify(session, never()).setAttribute(anyString(), anyString());
-		
-		assertEquals(new Page(Path.COMMAND__PROFILE_UPDATE_PAGE + "&error=phone_exist", true), result);	
+
+		assertEquals(new Page(Path.COMMAND__PROFILE_UPDATE_PAGE + Parameter.ERROR__QUERY + Error.PHONE__EXIST, true),
+				result);
 	}
-	
+
 	@Test
 	public void testProfileUpdateFailPhoneFormat() throws IOException, ServletException {
-		
+
 		Page result = profileUpdateCommand.execute(request, response);
-		
+
 		verify(request, times(1)).getSession(false);
 		verify(session, never()).setAttribute(anyString(), anyString());
-		
-		assertEquals(new Page(Path.COMMAND__PROFILE_UPDATE_PAGE + "&error=phone_format", true), result);	
+
+		assertEquals(new Page(Path.COMMAND__PROFILE_UPDATE_PAGE + Parameter.ERROR__QUERY + Error.PHONE__FORMAT, true),
+				result);
 	}
-	
+
 	@Test
 	public void testProfileUpdateFailPasswordFormat() throws IOException, ServletException {
-		when(request.getParameter("phone")).thenReturn(phone);
-		when(request.getParameter("password")).thenReturn(invalidPassword);
-		
+		when(request.getParameter(Parameter.PERSON__PHONE)).thenReturn(phone);
+		when(request.getParameter(Parameter.PERSON__PASSWORD)).thenReturn(invalidPassword);
+
 		Page result = profileUpdateCommand.execute(request, response);
-		
+
 		verify(request, times(1)).getSession(false);
 		verify(session, never()).setAttribute(anyString(), anyString());
-		
-		assertEquals(new Page(Path.COMMAND__PROFILE_UPDATE_PAGE + "&error=password", true), result);	
+
+		assertEquals(
+				new Page(Path.COMMAND__PROFILE_UPDATE_PAGE + Parameter.ERROR__QUERY + Error.PASSWORD__FORMAT, true),
+				result);
 	}
-	
+
 	@Test
 	public void testProfileUpdateFailPasswordConfirm() throws IOException, ServletException {
-		when(request.getParameter("phone")).thenReturn(phone);
-		when(request.getParameter("password")).thenReturn(validPassword);
-		when(request.getParameter("passwordConfirm")).thenReturn(invalidPassword);
-		
+		when(request.getParameter(Parameter.PERSON__PHONE)).thenReturn(phone);
+		when(request.getParameter(Parameter.PERSON__PASSWORD)).thenReturn(validPassword);
+		when(request.getParameter(Parameter.PERSON__PASSWORD_CONFIRM)).thenReturn(invalidPassword);
+
 		Page result = profileUpdateCommand.execute(request, response);
-		
+
 		verify(request, times(1)).getSession(false);
 		verify(session, never()).setAttribute(anyString(), anyString());
-		
-		assertEquals(new Page(Path.COMMAND__PROFILE_UPDATE_PAGE + "&error=password_confirm", true), result);	
+
+		assertEquals(
+				new Page(Path.COMMAND__PROFILE_UPDATE_PAGE + Parameter.ERROR__QUERY + Error.PASSWORD__CONFIRM_WRONG,
+						true),
+				result);
 	}
-	
+
 	@Test
 	public void testProfileUpdateFailNameFormat() throws IOException, ServletException {
-		when(request.getParameter("phone")).thenReturn(phone);
-		when(request.getParameter("password")).thenReturn(validPassword);
-		when(request.getParameter("passwordConfirm")).thenReturn(validPassword);
-		when(request.getParameter("name")).thenReturn(invalidName);
-		
+		when(request.getParameter(Parameter.PERSON__PHONE)).thenReturn(phone);
+		when(request.getParameter(Parameter.PERSON__PASSWORD)).thenReturn(validPassword);
+		when(request.getParameter(Parameter.PERSON__PASSWORD_CONFIRM)).thenReturn(validPassword);
+		when(request.getParameter(Parameter.PERSON__NAME)).thenReturn(invalidName);
+
 		Page result = profileUpdateCommand.execute(request, response);
-		
+
 		verify(request, times(1)).getSession(false);
 		verify(session, never()).setAttribute(anyString(), anyString());
-		
-		assertEquals(new Page(Path.COMMAND__PROFILE_UPDATE_PAGE + "&error=name", true), result);	
+
+		assertEquals(new Page(Path.COMMAND__PROFILE_UPDATE_PAGE + Parameter.ERROR__QUERY + Error.NAME__FORMAT, true),
+				result);
 	}
-	
+
 	@Test
 	public void testProfileUpdateFailSurnameFormat() throws IOException, ServletException {
-		when(request.getParameter("phone")).thenReturn(phone);
-		when(request.getParameter("password")).thenReturn(validPassword);
-		when(request.getParameter("passwordConfirm")).thenReturn(validPassword);
-		when(request.getParameter("name")).thenReturn(validName);
-		when(request.getParameter("surname")).thenReturn(invalidSurname);
-		
+		when(request.getParameter(Parameter.PERSON__PHONE)).thenReturn(phone);
+		when(request.getParameter(Parameter.PERSON__PASSWORD)).thenReturn(validPassword);
+		when(request.getParameter(Parameter.PERSON__PASSWORD_CONFIRM)).thenReturn(validPassword);
+		when(request.getParameter(Parameter.PERSON__NAME)).thenReturn(validName);
+		when(request.getParameter(Parameter.PERSON__SURNAME)).thenReturn(invalidSurname);
+
 		Page result = profileUpdateCommand.execute(request, response);
-		
+
 		verify(request, times(1)).getSession(false);
 		verify(session, never()).setAttribute(anyString(), anyString());
-		
-		assertEquals(new Page(Path.COMMAND__PROFILE_UPDATE_PAGE + "&error=surname", true), result);	
+
+		assertEquals(new Page(Path.COMMAND__PROFILE_UPDATE_PAGE + Parameter.ERROR__QUERY + Error.SURNAME__FORMAT, true),
+				result);
 	}
 
 }

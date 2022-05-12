@@ -27,7 +27,7 @@ import com.example.taxiservice.model.Car;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CarDaoMySqlTest {
-	
+
 	@Mock
 	private DataSource dataSource;
 	@Mock
@@ -36,10 +36,10 @@ public class CarDaoMySqlTest {
 	private PreparedStatement statement;
 	@Mock
 	private ResultSet set;
-	
+
 	@InjectMocks
 	private CarDaoMySql carDaoMySql;
-	
+
 	private Car car;
 
 	@Before
@@ -51,15 +51,15 @@ public class CarDaoMySqlTest {
 		car.setCategoryId(1L);
 		car.setLocationId(1L);
 		car.setStatusId(1);
-		
+
 		when(dataSource.getConnection()).thenReturn(connection);
-		
+
 		when(connection.prepareStatement(anyString())).thenReturn(statement);
 		when(connection.prepareStatement(anyString(), anyInt())).thenReturn(statement);
-		
+
 		when(statement.executeQuery()).thenReturn(set);
 		when(statement.getGeneratedKeys()).thenReturn(set);
-		
+
 		when(set.next()).thenReturn(Boolean.TRUE, Boolean.FALSE);
 		when(set.getLong(Fields.CAR__ID)).thenReturn(car.getId());
 		when(set.getString(Fields.CAR__REG_NUMBER)).thenReturn(car.getRegNumber());
@@ -72,14 +72,14 @@ public class CarDaoMySqlTest {
 	@Test
 	public void testFindById() {
 		Car result = carDaoMySql.find(1L);
-		assertEquals(car, result);	
+		assertEquals(car, result);
 	}
-	
+
 	@Test
 	public void testInsert() throws SQLException {
-		
+
 		carDaoMySql.insert(car);
-		
+
 		// verify and assert
 		verify(connection, times(1)).prepareStatement(anyString(), anyInt());
 		verify(statement, times(1)).setString(anyInt(), anyString());
@@ -88,14 +88,14 @@ public class CarDaoMySqlTest {
 		verify(set, times(2)).next();
 		verify(set, times(1)).getLong(anyInt());
 		verify(connection, times(1)).commit();
-		
+
 	}
-	
+
 	@Test
 	public void testUpdate() throws SQLException {
-		
+
 		carDaoMySql.update(car);
-		
+
 		// verify and assert
 		verify(connection, times(1)).prepareStatement(anyString());
 		verify(statement, times(1)).setString(anyInt(), anyString());
@@ -103,7 +103,7 @@ public class CarDaoMySqlTest {
 		verify(statement, times(1)).setInt(anyInt(), anyInt());
 		verify(statement, times(1)).executeUpdate();
 		verify(connection, times(1)).commit();
-		
+
 	}
 
 }
