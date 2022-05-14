@@ -20,7 +20,7 @@ import com.example.taxiservice.model.Person;
 public class PersonService {
 
 	private static final String PHONE_PATTERN = "[0-9]{10}";
-	private static final String TEXT_PATTERN = "[A-Z][a-z]+|[А-Я][а-я]+";
+	private static final String TEXT_PATTERN = "[A-Z][a-z]+|[\\p{IsCyrillic}&&\\p{Lu}][\\p{IsCyrillic}&&\\p{Ll}]+";
 	private static final String PASSWORD_PATTERN = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$";
 	private static final Logger LOG = LoggerFactory.getLogger(PersonService.class);
 

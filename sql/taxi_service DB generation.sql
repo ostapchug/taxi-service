@@ -290,21 +290,8 @@ CLOSE curs;
 END$$
 DELIMITER ;
 
-DELIMITER $$
-CREATE TRIGGER `check_trip_status`
-BEFORE UPDATE ON `trip`
-FOR EACH ROW
-BEGIN
-	IF NEW.t_status > `t_status` THEN
-		BEGIN
-			SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Wrong trip_status';
-		END;
-	END IF;
-END$$
-DELIMITER ;
-
 DELIMITER $$ 
-CREATE PROCEDURE get_cars(IN capacity INT, IN category INT)
+CREATE PROCEDURE `get_cars`(IN capacity INT, IN category INT)
 BEGIN
 	DECLARE done INT DEFAULT 0;
 	DECLARE cur_count INT;

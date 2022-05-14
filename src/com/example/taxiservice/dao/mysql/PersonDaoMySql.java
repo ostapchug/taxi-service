@@ -95,7 +95,7 @@ public class PersonDaoMySql extends AbstractDao<Person> implements PersonDao {
 
 	@Override
 	public boolean insert(Person person) {
-		boolean result = true;
+		boolean result = false;
 		Connection connection = null;
 		PreparedStatement statement = null;
 		ResultSet set = null;
@@ -115,7 +115,7 @@ public class PersonDaoMySql extends AbstractDao<Person> implements PersonDao {
 			}
 
 			commit(connection);
-			result = false;
+			result = true;
 		} catch (SQLException e) {
 			rollback(connection);
 			LOG.error(e.getMessage());

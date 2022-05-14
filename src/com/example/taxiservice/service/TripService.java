@@ -76,6 +76,10 @@ public class TripService {
 	public BigDecimal getDiscount(Long personId, BigDecimal bill) {
 		BigDecimal result = null;
 		BigDecimal totalBill = tripDao.getTotalBill(personId);
+		
+		if(totalBill == null) {
+			totalBill = new BigDecimal(0);
+		}
 
 		if (totalBill.compareTo(new BigDecimal(100)) >= 0) {
 			result = bill.multiply(new BigDecimal(0.02));

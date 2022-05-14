@@ -48,7 +48,7 @@
 							</h3>
 							<br> <a href="?command=new_trip_page"
 								class="btn btn-success" role="button"> <fmt:message
-									key="trip_jsp.anchor.info" />
+									key="new_trip_jsp.anchor.header" />
 							</a>
 						</div>
 					</c:otherwise>

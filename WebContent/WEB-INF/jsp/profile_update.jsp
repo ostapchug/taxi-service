@@ -17,6 +17,16 @@
 
 	<div class="container">
 		<div class="row">
+
+			<c:if test="${not empty errorMessage}">
+				<div class="alert alert-danger alert-dismissible">
+					<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+					<strong> <fmt:message key="general.label.anchor.error" />
+					</strong>
+					<fmt:message key="${errorMessage}" />
+				</div>
+			</c:if>
+
 			<div class="col-sm-offset-3 col-md-6 inf-content">
 				<h3>
 					<fmt:message key="profile_update_jsp.anchor.info" />
