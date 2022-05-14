@@ -30,13 +30,13 @@ DROP TABLE IF EXISTS `m2m_trip_car` CASCADE;
 
 CREATE TABLE `person`
 (
-	`p_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `p_phone` VARCHAR(50) NOT NULL,
-	`p_password`CHAR(60) NOT NULL,
-    `p_name` VARCHAR(50),
-	`p_surname` VARCHAR(50),
-	`p_role` INT NOT NULL DEFAULT 1,
-	CONSTRAINT `PK_person` PRIMARY KEY (`p_id` ASC)
+`p_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+`p_phone` VARCHAR(50) NOT NULL,
+`p_password`CHAR(64) NOT NULL,
+`p_name` VARCHAR(50),
+`p_surname` VARCHAR(50),
+`p_role` INT NOT NULL DEFAULT 1,
+CONSTRAINT `PK_person` PRIMARY KEY (`p_id` ASC)
 );
 
 CREATE TABLE `role`
@@ -239,6 +239,8 @@ ALTER TABLE `m2m_trip_car`
  ADD CONSTRAINT `FK_trip_car_car`
 	FOREIGN KEY (`c_id`) REFERENCES `car` (`c_id`) ON DELETE Cascade ON UPDATE Cascade;
 
+/* Create Triggers, Stored Routines */
+
 DELIMITER $$
 CREATE TRIGGER `check_car_status`
 BEFORE INSERT ON `m2m_trip_car`
@@ -298,7 +300,8 @@ BEGIN
 	DECLARE count_size INT DEFAULT capacity;
     DECLARE cur_id INT UNSIGNED;
     DECLARE id INT UNSIGNED;
-    DECLARE curs CURSOR FOR SELECT `c_id`, `cm_seat_count` FROM `car` INNER JOIN `car_model` ON `c_model` = `cm_id` WHERE `c_status` = 0 AND `c_category` = category ORDER BY `cm_seat_count` DESC;
+    DECLARE curs CURSOR FOR SELECT `c_id`, `cm_seat_count` FROM `car` INNER JOIN `car_model` ON `c_model` = `cm_id` 
+							WHERE `c_status` = 0 AND `c_category` = category ORDER BY `cm_seat_count` DESC;
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
     
 	CREATE TABLE IF NOT EXISTS `temp_car`
