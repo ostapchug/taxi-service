@@ -81,14 +81,14 @@ public class TripService {
 			totalBill = new BigDecimal(0);
 		}
 
-		if (totalBill.compareTo(new BigDecimal(100)) >= 0) {
-			result = bill.multiply(new BigDecimal(0.02));
+		if (totalBill.compareTo(new BigDecimal(1000)) >= 0) {
+			result = bill.multiply(new BigDecimal(0.10));
 
 		} else if (totalBill.compareTo(new BigDecimal(500)) >= 0) {
 			result = bill.multiply(new BigDecimal(0.05));
 
-		} else if (totalBill.compareTo(new BigDecimal(1000)) >= 0) {
-			result = bill.multiply(new BigDecimal(0.10));
+		} else if (totalBill.compareTo(new BigDecimal(100)) >= 0) {
+			result = bill.multiply(new BigDecimal(0.02));
 		} else {
 			result = new BigDecimal(0);
 		}
