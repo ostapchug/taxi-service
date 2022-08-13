@@ -13,20 +13,18 @@ import com.example.taxiservice.web.Page;
  * Main interface for the Command pattern implementation
  */
 public abstract class Command implements Serializable {
+    private static final long serialVersionUID = 4393881322523840683L;
 
-	private static final long serialVersionUID = 4393881322523840683L;
+    /**
+     * Execution method for command.
+     * 
+     * @return Page object which contain address to go once the command is executed.
+     */
+    public abstract Page execute(HttpServletRequest request, HttpServletResponse response)
+            throws IOException, ServletException;
 
-	/**
-	 * Execution method for command.
-	 * 
-	 * @return Page object which contain address to go once the command is executed.
-	 */
-	public abstract Page execute(HttpServletRequest request, HttpServletResponse response)
-			throws IOException, ServletException;
-
-	@Override
-	public final String toString() {
-		return getClass().getSimpleName();
-	}
-
+    @Override
+    public final String toString() {
+        return getClass().getSimpleName();
+    }
 }

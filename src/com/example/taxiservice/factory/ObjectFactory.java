@@ -12,49 +12,42 @@ import com.example.taxiservice.factory.config.ObjectConfigurator;
  * Object factory - creates and configures objects.
  */
 public class ObjectFactory {
+    private static final Logger LOG = LoggerFactory.getLogger(ObjectFactory.class);
+    private final AppContext context;
+    private List<ObjectConfigurator> configurators = new ArrayList<>();
 
-	private static final Logger LOG = LoggerFactory.getLogger(ObjectFactory.class);
+    public ObjectFactory(AppContext context) {
+        this.context = context;
+        // finds all available configurators.
+        for (Class<? extends ObjectConfigurator> aClass : context.getConfig().getScanner()
+                .getSubTypesOf(ObjectConfigurator.class)) {
+            try {
+                configurators.add(aClass.getDeclaredConstructor().newInstance());
+            } catch (Exception e) {
+                LOG.error(e.getMessage());
+            }
+        }
+        LOG.info("ObjectFactory initialized");
+    }
 
-	private final AppContext context;
-	private List<ObjectConfigurator> configurators = new ArrayList<>();
+    public <T> T createObject(Class<T> implClass) {
+        T t = create(implClass);
+        configure(t);
+        return t;
+    }
 
-	public ObjectFactory(AppContext context) {
-		this.context = context;
-		// finds all available configurators.
-		for (Class<? extends ObjectConfigurator> aClass : context.getConfig().getScanner()
-				.getSubTypesOf(ObjectConfigurator.class)) {
-			try {
-				configurators.add(aClass.getDeclaredConstructor().newInstance());
-			} catch (Exception e) {
-				LOG.error(e.getMessage());
-			}
-		}
+    private <T> void configure(T t) {
+        configurators.forEach(objectConfigurator -> objectConfigurator.configure(t, context));
+    }
 
-		LOG.info("ObjectFactory initialized");
-	}
+    private <T> T create(Class<T> implClass) {
+        T t = null;
 
-	public <T> T createObject(Class<T> implClass) {
-
-		T t = create(implClass);
-		configure(t);
-
-		return t;
-	}
-
-	private <T> void configure(T t) {
-		configurators.forEach(objectConfigurator -> objectConfigurator.configure(t, context));
-	}
-
-	private <T> T create(Class<T> implClass) {
-		T t = null;
-
-		try {
-			t = implClass.getDeclaredConstructor().newInstance();
-		} catch (Exception e) {
-			LOG.error(e.getMessage());
-		}
-
-		return t;
-	}
-
+        try {
+            t = implClass.getDeclaredConstructor().newInstance();
+        } catch (Exception e) {
+            LOG.error(e.getMessage());
+        }
+        return t;
+    }
 }

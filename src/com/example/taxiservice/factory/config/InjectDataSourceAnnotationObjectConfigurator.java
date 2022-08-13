@@ -15,35 +15,28 @@ import com.example.taxiservice.factory.annotation.InjectDataSource;
  * annotated field.
  */
 public class InjectDataSourceAnnotationObjectConfigurator implements ObjectConfigurator {
+    private static final Logger LOG = LoggerFactory.getLogger(InjectDataSourceAnnotationObjectConfigurator.class);
 
-	private static final Logger LOG = LoggerFactory.getLogger(InjectDataSourceAnnotationObjectConfigurator.class);
-
-	@Override
-	public void configure(Object t, AppContext context) {
-
-		LOG.debug("Configuring starts");
-
-		Class<?> current = t.getClass();
-		while (current.getSuperclass() != null) {
-
-			for (Field field : current.getDeclaredFields()) {
-
-				if (field.isAnnotationPresent(InjectDataSource.class)) {
-					DataSource dataSource = context.getDataSource();
-					field.setAccessible(true);
-					try {
-						field.set(t, dataSource);
-					} catch (IllegalArgumentException | IllegalAccessException e) {
-						LOG.error(e.getMessage());
-					}
-				}
-
-			}
-
-			current = current.getSuperclass();
-		}
-
-		LOG.debug("Configuring finished");
-	}
-
+    @Override
+    public void configure(Object t, AppContext context) {
+        LOG.debug("Configuring starts");
+        Class<?> current = t.getClass();
+        
+        while (current.getSuperclass() != null) {
+            for (Field field : current.getDeclaredFields()) {
+                if (field.isAnnotationPresent(InjectDataSource.class)) {
+                    DataSource dataSource = context.getDataSource();
+                    field.setAccessible(true);
+ 
+                    try {
+                        field.set(t, dataSource);
+                    } catch (IllegalArgumentException | IllegalAccessException e) {
+                        LOG.error(e.getMessage());
+                    }
+                }
+            }
+            current = current.getSuperclass();
+        }
+        LOG.debug("Configuring finished");
+    }
 }

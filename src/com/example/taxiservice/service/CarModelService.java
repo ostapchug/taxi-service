@@ -14,26 +14,24 @@ import com.example.taxiservice.model.CarModel;
 
 @Singleton
 public class CarModelService {
+    private static final Logger LOG = LoggerFactory.getLogger(CarModelService.class);
 
-	private static final Logger LOG = LoggerFactory.getLogger(CarModelService.class);
+    @InjectByType
+    private CarModelDao carModelDao;
 
-	@InjectByType
-	private CarModelDao carModelDao;
+    public CarModelService() {
+        LOG.info("CarModelService initialized");
+    }
 
-	public CarModelService() {
-		LOG.info("CarModelService initialized");
-	}
+    public CarModel find(Long id) {
+        return carModelDao.find(id);
+    }
 
-	public CarModel find(Long id) {
-		return carModelDao.find(id);
-	}
+    public boolean insert(CarModel carModel) {
+        return carModelDao.insert(carModel);
+    }
 
-	public boolean insert(CarModel carModel) {
-		return carModelDao.insert(carModel);
-	}
-
-	public boolean update(CarModel carModel) {
-		return carModelDao.update(carModel);
-	}
-
+    public boolean update(CarModel carModel) {
+        return carModelDao.update(carModel);
+    }
 }

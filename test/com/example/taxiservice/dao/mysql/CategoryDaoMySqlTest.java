@@ -30,76 +30,70 @@ import com.example.taxiservice.model.Category;
 @RunWith(MockitoJUnitRunner.class)
 public class CategoryDaoMySqlTest {
 
-	@Mock
-	private DataSource dataSource;
-	@Mock
-	private Connection connection;
-	@Mock
-	private PreparedStatement statement;
-	@Mock
-	private ResultSet set;
+    @Mock
+    private DataSource dataSource;
+    @Mock
+    private Connection connection;
+    @Mock
+    private PreparedStatement statement;
+    @Mock
+    private ResultSet set;
 
-	@InjectMocks
-	private CategoryDaoMySql categoryDaoMySql;
+    @InjectMocks
+    private CategoryDaoMySql categoryDaoMySql;
 
-	private Category category;
+    private Category category;
 
-	@Before
-	public void setUp() throws Exception {
-		category = new Category();
-		category.setId(1L);
-		category.setName("Economy");
-		category.setPrice(new BigDecimal(25));
+    @Before
+    public void setUp() throws Exception {
+        category = new Category();
+        category.setId(1L);
+        category.setName("Economy");
+        category.setPrice(new BigDecimal(25));
 
-		when(dataSource.getConnection()).thenReturn(connection);
+        when(dataSource.getConnection()).thenReturn(connection);
+        when(connection.prepareStatement(anyString())).thenReturn(statement);
+        when(connection.prepareStatement(anyString(), anyInt())).thenReturn(statement);
+        when(statement.executeQuery()).thenReturn(set);
+        when(statement.getGeneratedKeys()).thenReturn(set);
+        when(set.next()).thenReturn(Boolean.TRUE, Boolean.FALSE);
+        when(set.getLong(Fields.CATEGORY__ID)).thenReturn(category.getId());
+        when(set.getString(Fields.CATEGORY__NAME)).thenReturn(category.getName());
+        when(set.getBigDecimal(Fields.CATEGORY__PRICE)).thenReturn(category.getPrice());
+    }
 
-		when(connection.prepareStatement(anyString())).thenReturn(statement);
-		when(connection.prepareStatement(anyString(), anyInt())).thenReturn(statement);
+    @Test
+    public void testFindById() {
+        Category result = categoryDaoMySql.find(1L);
+        assertEquals(category, result);
+    }
 
-		when(statement.executeQuery()).thenReturn(set);
-		when(statement.getGeneratedKeys()).thenReturn(set);
+    @Test
+    public void testInsert() throws SQLException {
 
-		when(set.next()).thenReturn(Boolean.TRUE, Boolean.FALSE);
-		when(set.getLong(Fields.CATEGORY__ID)).thenReturn(category.getId());
-		when(set.getString(Fields.CATEGORY__NAME)).thenReturn(category.getName());
-		when(set.getBigDecimal(Fields.CATEGORY__PRICE)).thenReturn(category.getPrice());
-	}
+        categoryDaoMySql.insert(category);
 
-	@Test
-	public void testFindById() {
-		Category result = categoryDaoMySql.find(1L);
-		assertEquals(category, result);
-	}
+        // verify and assert
+        verify(connection, times(1)).prepareStatement(anyString(), anyInt());
+        verify(statement, times(1)).setString(anyInt(), anyString());
+        verify(statement, times(1)).setBigDecimal(anyInt(), any());
+        verify(statement, times(1)).executeUpdate();
+        verify(set, times(2)).next();
+        verify(set, times(1)).getLong(anyInt());
+        verify(connection, times(1)).commit();
+    }
 
-	@Test
-	public void testInsert() throws SQLException {
+    @Test
+    public void testUpdate() throws SQLException {
 
-		categoryDaoMySql.insert(category);
+        categoryDaoMySql.update(category);
 
-		// verify and assert
-		verify(connection, times(1)).prepareStatement(anyString(), anyInt());
-		verify(statement, times(1)).setString(anyInt(), anyString());
-		verify(statement, times(1)).setBigDecimal(anyInt(), any());
-		verify(statement, times(1)).executeUpdate();
-		verify(set, times(2)).next();
-		verify(set, times(1)).getLong(anyInt());
-		verify(connection, times(1)).commit();
-
-	}
-
-	@Test
-	public void testUpdate() throws SQLException {
-
-		categoryDaoMySql.update(category);
-
-		// verify and assert
-		verify(connection, times(1)).prepareStatement(anyString());
-		verify(statement, times(1)).setString(anyInt(), anyString());
-		verify(statement, times(1)).setBigDecimal(anyInt(), any());
-		verify(statement, times(1)).setLong(anyInt(), anyLong());
-		verify(statement, times(1)).executeUpdate();
-		verify(connection, times(1)).commit();
-
-	}
-
+        // verify and assert
+        verify(connection, times(1)).prepareStatement(anyString());
+        verify(statement, times(1)).setString(anyInt(), anyString());
+        verify(statement, times(1)).setBigDecimal(anyInt(), any());
+        verify(statement, times(1)).setLong(anyInt(), anyLong());
+        verify(statement, times(1)).executeUpdate();
+        verify(connection, times(1)).commit();
+    }
 }

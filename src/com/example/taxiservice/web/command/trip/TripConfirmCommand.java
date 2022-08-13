@@ -25,70 +25,64 @@ import com.example.taxiservice.web.command.Command;
  * Trip confirm command.
  */
 public class TripConfirmCommand extends Command {
+    private static final long serialVersionUID = -6632486558571801735L;
+    private static final Logger LOG = LoggerFactory.getLogger(TripConfirmCommand.class);
 
-	private static final long serialVersionUID = -6632486558571801735L;
-	private static final Logger LOG = LoggerFactory.getLogger(TripConfirmCommand.class);
+    @InjectByType
+    private TripService tripService;
 
-	@InjectByType
-	private TripService tripService;
+    public TripConfirmCommand() {
+        LOG.info("TripConfirmCommand initialized");
+    }
 
-	public TripConfirmCommand() {
-		LOG.info("TripConfirmCommand initialized");
-	}
+    @Override
+    public Page execute(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        LOG.debug("Command start");
+        Page result = null;
 
-	@Override
-	public Page execute(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-		LOG.debug("Command start");
-		Page result = null;
+        if ("GET".contentEquals(request.getMethod())) {
+            result = new Page(Path.COMMAND__TRIPS_PAGE, true);
+        } else if ("POST".contentEquals(request.getMethod())) {
+            result = doPost(request, response);
+        }
+        LOG.debug("Command finish");
+        return result;
+    }
 
-		if ("GET".contentEquals(request.getMethod())) {
-			result = new Page(Path.COMMAND__TRIPS_PAGE, true);
-		} else if ("POST".contentEquals(request.getMethod())) {
-			result = doPost(request, response);
-		}
+    /**
+     * Creates new trip from session data and store it in the DB. As first page
+     * displays a trips page.
+     *
+     * @return Page object which contain path to the view of trips page.
+     */
+    private Page doPost(HttpServletRequest request, HttpServletResponse response) {
+        Page result = null;
+        HttpSession session = request.getSession(false);
+        TripConfirmDto tripConfirm = (TripConfirmDto) session.getAttribute(Attribute.TRIP__CONFIRM);
+        long personId = (long) session.getAttribute(Attribute.PERSON__ID);
+        session.removeAttribute(Attribute.TRIP__CONFIRM);
 
-		LOG.debug("Command finish");
-		return result;
-	}
+        // obtain confirmation from the request
+        String confirm = request.getParameter(Parameter.TRIP_CONFIRM);
 
-	/**
-	 * Creates new trip from session data and store it in the DB. As first page
-	 * displays a trips page.
-	 *
-	 * @return Page object which contain path to the view of trips page.
-	 */
-	private Page doPost(HttpServletRequest request, HttpServletResponse response) {
-		Page result = null;
+        if (tripConfirm != null && "confirmed".equals(confirm)) {
+            Trip trip = new Trip();
+            trip.setPersonId(personId);
+            trip.setOriginId(tripConfirm.getOriginId());
+            trip.setDestinationId(tripConfirm.getDestinationId());
+            trip.setDistance(tripConfirm.getDistance());
+            trip.setBill(tripConfirm.getTotal());
 
-		HttpSession session = request.getSession(false);
-		TripConfirmDto tripConfirm = (TripConfirmDto) session.getAttribute(Attribute.TRIP__CONFIRM);
-		long personId = (long) session.getAttribute(Attribute.PERSON__ID);
-		session.removeAttribute(Attribute.TRIP__CONFIRM);
+            boolean inserted = tripService.insert(trip, tripConfirm.getCars());
 
-		// obtain confirmation from the request
-		String confirm = request.getParameter(Parameter.TRIP_CONFIRM);
-
-		if (tripConfirm != null && "confirmed".equals(confirm)) {
-			Trip trip = new Trip();
-			trip.setPersonId(personId);
-			trip.setOriginId(tripConfirm.getOriginId());
-			trip.setDestinationId(tripConfirm.getDestinationId());
-			trip.setDistance(tripConfirm.getDistance());
-			trip.setBill(tripConfirm.getTotal());
-
-			boolean inserted = tripService.insert(trip, tripConfirm.getCars());
-
-			if (inserted) {
-				result = new Page(Path.COMMAND__TRIPS_PAGE, true);
-			} else {
-				result = new Page(Path.COMMAND__NEW_TRIP_PAGE + Parameter.ERROR__QUERY + Error.TRIP__CREATE, true);
-			}
-
-		} else {
-			result = new Page(Path.COMMAND__NEW_TRIP_PAGE, true);
-		}
-
-		return result;
-	}
-
+            if (inserted) {
+                result = new Page(Path.COMMAND__TRIPS_PAGE, true);
+            } else {
+                result = new Page(Path.COMMAND__NEW_TRIP_PAGE + Parameter.ERROR__QUERY + Error.TRIP__CREATE, true);
+            }
+        } else {
+            result = new Page(Path.COMMAND__NEW_TRIP_PAGE, true);
+        }
+        return result;
+    }
 }

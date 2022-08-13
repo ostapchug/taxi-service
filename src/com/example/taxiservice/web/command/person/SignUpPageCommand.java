@@ -21,51 +21,49 @@ import com.example.taxiservice.web.command.Command;
  * Sign up page command.
  */
 public class SignUpPageCommand extends Command {
+    private static final long serialVersionUID = 5964706657242219655L;
+    private static final Logger LOG = LoggerFactory.getLogger(SignUpPageCommand.class);
 
-	private static final long serialVersionUID = 5964706657242219655L;
-	private static final Logger LOG = LoggerFactory.getLogger(SignUpPageCommand.class);
+    public SignUpPageCommand() {
+        LOG.info("SignUpPageCommand initialized");
+    }
 
-	public SignUpPageCommand() {
-		LOG.info("SignUpPageCommand initialized");
-	}
+    @Override
+    public Page execute(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        LOG.debug("Command start");
 
-	@Override
-	public Page execute(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-		LOG.debug("Command start");
+        // obtain error message from the request
+        String errorMessage = request.getParameter(Parameter.ERROR);
 
-		// obtain error message from the request
-		String errorMessage = request.getParameter(Parameter.ERROR);
-
-		// handle error message from the request, if not null set appropriate attribute
-		if (errorMessage != null) {
-			switch (errorMessage) {
-			case Error.PHONE__FORMAT:
-				request.setAttribute(Attribute.ERROR__PHONE, ErrorMsg.FORMAT);
-				break;
-			case Error.PHONE__EXIST:
-				request.setAttribute(Attribute.ERROR__PHONE, ErrorMsg.PHONE__EXIST);
-				break;
-			case Error.PASSWORD__FORMAT:
-				request.setAttribute(Attribute.ERROR__PASSWORD, ErrorMsg.FORMAT);
-				break;
-			case Error.PASSWORD__CONFIRM_WRONG:
-				request.setAttribute(Attribute.ERROR__PASSWORD_CONFIRM, ErrorMsg.PASSWORD__CONFIRM_WRONG);
-				break;
-			case Error.NAME__FORMAT:
-				request.setAttribute(Attribute.ERROR__NAME, ErrorMsg.FORMAT);
-				break;
-			case Error.SURNAME__FORMAT:
-				request.setAttribute(Attribute.ERROR__SURNAME, ErrorMsg.FORMAT);
-				break;
-			case Error.PROFILE__CREATE:
-				request.setAttribute(Attribute.ERROR__MESSAGE, ErrorMsg.PROFILE__CREATE);
-				break;
-			default:
-				break;
-			}
-		}
-		LOG.debug("Command finish");
-		return new Page(Path.PAGE__SIGN_UP);
-	}
-
+        // handle error message from the request, if not null set appropriate attribute
+        if (errorMessage != null) {
+            switch (errorMessage) {
+            case Error.PHONE__FORMAT:
+                request.setAttribute(Attribute.ERROR__PHONE, ErrorMsg.FORMAT);
+                break;
+            case Error.PHONE__EXIST:
+                request.setAttribute(Attribute.ERROR__PHONE, ErrorMsg.PHONE__EXIST);
+                break;
+            case Error.PASSWORD__FORMAT:
+                request.setAttribute(Attribute.ERROR__PASSWORD, ErrorMsg.FORMAT);
+                break;
+            case Error.PASSWORD__CONFIRM_WRONG:
+                request.setAttribute(Attribute.ERROR__PASSWORD_CONFIRM, ErrorMsg.PASSWORD__CONFIRM_WRONG);
+                break;
+            case Error.NAME__FORMAT:
+                request.setAttribute(Attribute.ERROR__NAME, ErrorMsg.FORMAT);
+                break;
+            case Error.SURNAME__FORMAT:
+                request.setAttribute(Attribute.ERROR__SURNAME, ErrorMsg.FORMAT);
+                break;
+            case Error.PROFILE__CREATE:
+                request.setAttribute(Attribute.ERROR__MESSAGE, ErrorMsg.PROFILE__CREATE);
+                break;
+            default:
+                break;
+            }
+        }
+        LOG.debug("Command finish");
+        return new Page(Path.PAGE__SIGN_UP);
+    }
 }

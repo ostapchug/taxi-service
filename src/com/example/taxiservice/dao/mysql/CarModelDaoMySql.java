@@ -21,131 +21,119 @@ import com.example.taxiservice.model.CarModel;
 
 @Singleton
 public class CarModelDaoMySql extends AbstractDao<CarModel> implements CarModelDao {
+    private static final String SQL__FIND_CAR_MODEL_BY_ID = "SELECT * FROM car_model WHERE cm_id=?";
+    private static final String SQL__INSERT_CAR_MODEL = "INSERT INTO car_model (cm_brand, cm_name, cm_color, cm_year, cm_seat_count) VALUES (?,?,?,?,?)";
+    private static final String SQL__UPDATE_CAR_MODEL = "UPDATE car_model SET cm_brand=?, cm_name=?, cm_color=?, cm_year=?, cm_seat_count=?  WHERE c_id = ?";
+    private static final Logger LOG = LoggerFactory.getLogger(CarModelDaoMySql.class);
 
-	private static final String SQL__FIND_CAR_MODEL_BY_ID = "SELECT * FROM car_model WHERE cm_id=?";
-	private static final String SQL__INSERT_CAR_MODEL = "INSERT INTO car_model (cm_brand, cm_name, cm_color, cm_year, cm_seat_count) VALUES (?,?,?,?,?)";
-	private static final String SQL__UPDATE_CAR_MODEL = "UPDATE car_model SET cm_brand=?, cm_name=?, cm_color=?, cm_year=?, cm_seat_count=?  WHERE c_id = ?";
+    public CarModelDaoMySql() {
+        LOG.info("MySqlCarModelDao initialized");
+    }
 
-	private static final Logger LOG = LoggerFactory.getLogger(CarModelDaoMySql.class);
+    @Override
+    public CarModel find(Long id) {
+        CarModel carModel = null;
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet set = null;
 
-	public CarModelDaoMySql() {
-		LOG.info("MySqlCarModelDao initialized");
-	}
+        try {
+            connection = getConnection();
+            statement = connection.prepareStatement(SQL__FIND_CAR_MODEL_BY_ID);
+            statement.setLong(1, id);
+            set = statement.executeQuery();
 
-	@Override
-	public CarModel find(Long id) {
-		CarModel carModel = null;
+            while (set.next()) {
+                carModel = mapRow(set);
+            }
 
-		Connection connection = null;
-		PreparedStatement statement = null;
-		ResultSet set = null;
+            commit(connection);
+        } catch (SQLException e) {
+            rollback(connection);
+            LOG.error(e.getMessage());
+        } finally {
+            close(set, statement, connection);
+        }
+        return carModel;
+    }
 
-		try {
-			connection = getConnection();
-			statement = connection.prepareStatement(SQL__FIND_CAR_MODEL_BY_ID);
-			statement.setLong(1, id);
-			set = statement.executeQuery();
+    @Override
+    public boolean insert(CarModel carModel) {
+        boolean result = false;
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet set = null;
 
-			while (set.next()) {
-				carModel = mapRow(set);
-			}
+        try {
+            connection = getConnection();
+            statement = connection.prepareStatement(SQL__INSERT_CAR_MODEL, Statement.RETURN_GENERATED_KEYS);
+            statement.setString(1, carModel.getBrand());
+            statement.setString(2, carModel.getName());
+            statement.setString(3, carModel.getColor());
+            statement.setInt(4, carModel.getYear());
+            statement.setInt(5, carModel.getSeatCount());
+            statement.executeUpdate();
+            set = statement.getGeneratedKeys();
 
-			commit(connection);
+            while (set.next()) {
+                carModel.setId(set.getLong(1));
+            }
 
-		} catch (SQLException e) {
-			rollback(connection);
-			LOG.error(e.getMessage());
-		} finally {
+            commit(connection);
+            result = true;
+        } catch (SQLException e) {
+            rollback(connection);
+            LOG.error(e.getMessage());
+        } finally {
+            close(set, statement, connection);
+        }
+        return result;
+    }
 
-			close(set, statement, connection);
-		}
+    @Override
+    public boolean update(CarModel carModel) {
+        boolean result = false;
+        Connection connection = null;
+        PreparedStatement statement = null;
 
-		return carModel;
-	}
+        try {
+            connection = getConnection();
+            statement = connection.prepareStatement(SQL__UPDATE_CAR_MODEL);
+            statement.setString(1, carModel.getBrand());
+            statement.setString(2, carModel.getName());
+            statement.setString(3, carModel.getColor());
+            statement.setInt(4, carModel.getYear());
+            statement.setInt(5, carModel.getSeatCount());
+            statement.setLong(6, carModel.getId());
+            statement.executeUpdate();
 
-	@Override
-	public boolean insert(CarModel carModel) {
-		boolean result = false;
-		Connection connection = null;
-		PreparedStatement statement = null;
-		ResultSet set = null;
+            commit(connection);
+            result = true;
+        } catch (SQLException e) {
+            rollback(connection);
+            LOG.error(e.getMessage());
+        } finally {
+            close(statement, connection);
+        }
+        return result;
+    }
 
-		try {
-			connection = getConnection();
-			statement = connection.prepareStatement(SQL__INSERT_CAR_MODEL, Statement.RETURN_GENERATED_KEYS);
-			statement.setString(1, carModel.getBrand());
-			statement.setString(2, carModel.getName());
-			statement.setString(3, carModel.getColor());
-			statement.setInt(4, carModel.getYear());
-			statement.setInt(5, carModel.getSeatCount());
-			statement.executeUpdate();
-			set = statement.getGeneratedKeys();
+    @Override
+    protected CarModel mapRow(ResultSet set) {
+        CarModel carModel = null;
 
-			while (set.next()) {
-				carModel.setId(set.getLong(1));
-			}
+        try {
+            carModel = new CarModel();
+            carModel.setId(set.getLong(Fields.CAR_MODEL__ID));
+            carModel.setBrand(set.getString(Fields.CAR_MODEL__BRAND));
+            carModel.setName(set.getString(Fields.CAR_MODEL__NAME));
+            carModel.setColor(set.getString(Fields.CAR_MODEL__COLOR));
+            carModel.setYear(set.getInt(Fields.CAR_MODEL__YEAR));
+            carModel.setSeatCount(set.getInt(Fields.CAR_MODEL__SEAT_COUNT));
 
-			commit(connection);
-			result = true;
-
-		} catch (SQLException e) {
-			rollback(connection);
-			LOG.error(e.getMessage());
-		} finally {
-			close(set, statement, connection);
-		}
-
-		return result;
-	}
-
-	@Override
-	public boolean update(CarModel carModel) {
-		boolean result = false;
-		Connection connection = null;
-		PreparedStatement statement = null;
-
-		try {
-			connection = getConnection();
-			statement = connection.prepareStatement(SQL__UPDATE_CAR_MODEL);
-			statement.setString(1, carModel.getBrand());
-			statement.setString(2, carModel.getName());
-			statement.setString(3, carModel.getColor());
-			statement.setInt(4, carModel.getYear());
-			statement.setInt(5, carModel.getSeatCount());
-			statement.setLong(6, carModel.getId());
-			statement.executeUpdate();
-
-			commit(connection);
-			result = true;
-
-		} catch (SQLException e) {
-			rollback(connection);
-			LOG.error(e.getMessage());
-		} finally {
-			close(statement, connection);
-		}
-
-		return result;
-	}
-
-	@Override
-	protected CarModel mapRow(ResultSet set) {
-		CarModel carModel = null;
-
-		try {
-			carModel = new CarModel();
-
-			carModel.setId(set.getLong(Fields.CAR_MODEL__ID));
-			carModel.setBrand(set.getString(Fields.CAR_MODEL__BRAND));
-			carModel.setName(set.getString(Fields.CAR_MODEL__NAME));
-			carModel.setColor(set.getString(Fields.CAR_MODEL__COLOR));
-			carModel.setYear(set.getInt(Fields.CAR_MODEL__YEAR));
-			carModel.setSeatCount(set.getInt(Fields.CAR_MODEL__SEAT_COUNT));
-
-		} catch (SQLException e) {
-			LOG.error(e.getMessage());
-		}
-		return carModel;
-	}
-
+        } catch (SQLException e) {
+            LOG.error(e.getMessage());
+        }
+        return carModel;
+    }
 }

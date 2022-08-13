@@ -15,42 +15,38 @@ import com.example.taxiservice.model.Category;
  */
 @Singleton
 public class CategoryService {
+    private static final Logger LOG = LoggerFactory.getLogger(CategoryService.class);
 
-	private static final Logger LOG = LoggerFactory.getLogger(CategoryService.class);
+    @InjectByType
+    private CategoryDao categoryDao;
 
-	@InjectByType
-	private CategoryDao categoryDao;
+    public CategoryService() {
+        LOG.info("CategoryService initialized");
+    }
 
-	public CategoryService() {
-		LOG.info("CategoryService initialized");
-	}
+    public Category find(Long id) {
+        return categoryDao.find(id);
+    }
 
-	public Category find(Long id) {
-		return categoryDao.find(id);
-	}
+    public Category find(Long id, String lang) {
+        Category result = null;
 
-	public Category find(Long id, String lang) {
-		Category result = null;
+        if (lang == null) {
+            result = categoryDao.find(id);
+        } else {
+            result = categoryDao.find(id, lang);
+        }
+        return result;
+    }
 
-		if (lang == null) {
-			result = categoryDao.find(id);
-		} else {
-			result = categoryDao.find(id, lang);
-		}
+    public List<Category> findAll(String lang) {
+        List<Category> result = null;
 
-		return result;
-	}
-
-	public List<Category> findAll(String lang) {
-		List<Category> result = null;
-
-		if (lang == null) {
-			result = categoryDao.findAll();
-		} else {
-			result = categoryDao.findAll(lang);
-		}
-
-		return result;
-	}
-
+        if (lang == null) {
+            result = categoryDao.findAll();
+        } else {
+            result = categoryDao.findAll(lang);
+        }
+        return result;
+    }
 }

@@ -6,92 +6,89 @@ import java.math.BigDecimal;
  * Location entity.
  */
 public class Location extends Entity {
+    private static final long serialVersionUID = 3768408533435589862L;
+    private String streetName;
+    private String streetNumber;
+    private BigDecimal latitude;
+    private BigDecimal longitude;
 
-	private static final long serialVersionUID = 3768408533435589862L;
+    public String getStreetName() {
+        return streetName;
+    }
 
-	private String streetName;
-	private String streetNumber;
-	private BigDecimal latitude;
-	private BigDecimal longitude;
+    public void setStreetName(String streetName) {
+        this.streetName = streetName;
+    }
 
-	public String getStreetName() {
-		return streetName;
-	}
+    public String getStreetNumber() {
+        return streetNumber;
+    }
 
-	public void setStreetName(String streetName) {
-		this.streetName = streetName;
-	}
+    public void setStreetNumber(String streetNumber) {
+        this.streetNumber = streetNumber;
+    }
 
-	public String getStreetNumber() {
-		return streetNumber;
-	}
+    public BigDecimal getLatitude() {
+        return latitude;
+    }
 
-	public void setStreetNumber(String streetNumber) {
-		this.streetNumber = streetNumber;
-	}
+    public void setLatitude(BigDecimal latitude) {
+        this.latitude = latitude;
+    }
 
-	public BigDecimal getLatitude() {
-		return latitude;
-	}
+    public BigDecimal getLongitude() {
+        return longitude;
+    }
 
-	public void setLatitude(BigDecimal latitude) {
-		this.latitude = latitude;
-	}
+    public void setLongitude(BigDecimal longitude) {
+        this.longitude = longitude;
+    }
 
-	public BigDecimal getLongitude() {
-		return longitude;
-	}
+    @Override
+    public String toString() {
+        return streetName + ", " + streetNumber;
+    }
 
-	public void setLongitude(BigDecimal longitude) {
-		this.longitude = longitude;
-	}
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + ((latitude == null) ? 0 : latitude.hashCode());
+        result = prime * result + ((longitude == null) ? 0 : longitude.hashCode());
+        result = prime * result + ((streetName == null) ? 0 : streetName.hashCode());
+        result = prime * result + ((streetNumber == null) ? 0 : streetNumber.hashCode());
+        return result;
+    }
 
-	@Override
-	public String toString() {
-		return streetName + ", " + streetNumber;
-	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = super.hashCode();
-		result = prime * result + ((latitude == null) ? 0 : latitude.hashCode());
-		result = prime * result + ((longitude == null) ? 0 : longitude.hashCode());
-		result = prime * result + ((streetName == null) ? 0 : streetName.hashCode());
-		result = prime * result + ((streetNumber == null) ? 0 : streetNumber.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (!super.equals(obj))
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Location other = (Location) obj;
-		if (latitude == null) {
-			if (other.latitude != null)
-				return false;
-		} else if (!latitude.equals(other.latitude))
-			return false;
-		if (longitude == null) {
-			if (other.longitude != null)
-				return false;
-		} else if (!longitude.equals(other.longitude))
-			return false;
-		if (streetName == null) {
-			if (other.streetName != null)
-				return false;
-		} else if (!streetName.equals(other.streetName))
-			return false;
-		if (streetNumber == null) {
-			if (other.streetNumber != null)
-				return false;
-		} else if (!streetNumber.equals(other.streetNumber))
-			return false;
-		return true;
-	}
-
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (!super.equals(obj))
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Location other = (Location) obj;
+        if (latitude == null) {
+            if (other.latitude != null)
+                return false;
+        } else if (!latitude.equals(other.latitude))
+            return false;
+        if (longitude == null) {
+            if (other.longitude != null)
+                return false;
+        } else if (!longitude.equals(other.longitude))
+            return false;
+        if (streetName == null) {
+            if (other.streetName != null)
+                return false;
+        } else if (!streetName.equals(other.streetName))
+            return false;
+        if (streetNumber == null) {
+            if (other.streetNumber != null)
+                return false;
+        } else if (!streetNumber.equals(other.streetNumber))
+            return false;
+        return true;
+    }
 }

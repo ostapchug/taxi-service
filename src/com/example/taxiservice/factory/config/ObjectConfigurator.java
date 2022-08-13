@@ -7,12 +7,12 @@ import com.example.taxiservice.factory.AppContext;
  */
 public interface ObjectConfigurator {
 
-	/**
-	 * Configures given object.
-	 * 
-	 * @param Object     - object to configure.
-	 * 
-	 * @param AppContext - context object with required resources for configuration.
-	 */
-	void configure(Object t, AppContext context);
+    /**
+     * Configures given object.
+     * 
+     * @param Object     - object to configure.
+     * 
+     * @param AppContext - context object with required resources for configuration.
+     */
+    void configure(Object t, AppContext context);
 }

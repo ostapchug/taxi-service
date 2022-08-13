@@ -8,14 +8,14 @@ import org.reflections.Reflections;
  */
 public interface Config {
 
-	/**
-	 * Returns interface implementation.
-	 * 
-	 * @param Class<T> - interface.
-	 * 
-	 * @return Class<? extends T> - implementation of the given interface.
-	 */
-	<T> Class<? extends T> getImplClass(Class<T> ifc);
+    /**
+     * Returns interface implementation.
+     * 
+     * @param Class<T> - interface.
+     * 
+     * @return Class<? extends T> - implementation of the given interface.
+     */
+    <T> Class<? extends T> getImplClass(Class<T> ifc);
 
-	Reflections getScanner();
+    Reflections getScanner();
 }

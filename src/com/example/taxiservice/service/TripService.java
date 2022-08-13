@@ -20,153 +20,139 @@ import com.example.taxiservice.model.Trip;
 /**
  * Service layer for Trip DAO object.
  */
-
 @Singleton
 public class TripService {
-	private static final Logger LOG = LoggerFactory.getLogger(TripService.class);
-	private static final String SORT_DESC = " DESC"; // leading space is very important
+    private static final Logger LOG = LoggerFactory.getLogger(TripService.class);
+    private static final String SORT_DESC = " DESC"; // leading space is very important
 
-	@InjectByType
-	private TripDao tripDao;
+    @InjectByType
+    private TripDao tripDao;
 
-	public TripService() {
-		LOG.info("TripService initialized");
-	}
+    public TripService() {
+        LOG.info("TripService initialized");
+    }
 
-	public Trip find(Long id) {
-		return tripDao.find(id);
-	}
+    public Trip find(Long id) {
+        return tripDao.find(id);
+    }
 
-	public boolean insert(Trip trip, Car... cars) {
-		return tripDao.insert(trip, cars);
-	}
+    public boolean insert(Trip trip, Car... cars) {
+        return tripDao.insert(trip, cars);
+    }
 
-	public List<Trip> findAll(int offset, int count, String sorting) {
-		String field = getFieldName(sorting);
+    public List<Trip> findAll(int offset, int count, String sorting) {
+        String field = getFieldName(sorting);
+        return tripDao.findAll(offset, count, field);
+    }
 
-		return tripDao.findAll(offset, count, field);
-	}
+    public List<Trip> findAllByDate(String dateRange, int offset, int count, String sorting) {
+        String field = getFieldName(sorting);
+        Timestamp[] range = getDateRange(dateRange);
+        return tripDao.findAllByDate(range, offset, count, field);
+    }
 
-	public List<Trip> findAllByDate(String dateRange, int offset, int count, String sorting) {
+    public List<Trip> findAllByPersonId(Long personId, int offset, int count, String sorting) {
+        String field = getFieldName(sorting);
+        return tripDao.findAllByPersonId(personId, offset, count, field);
+    }
 
-		String field = getFieldName(sorting);
-		Timestamp[] range = getDateRange(dateRange);
+    public List<Trip> findAllByPersonIdAndDate(Long personId, String dateRange, int offset, int count, String sorting) {
+        String field = getFieldName(sorting);
+        Timestamp[] range = getDateRange(dateRange);
+        return tripDao.findAllByPersonIdAndDate(personId, range, offset, count, field);
+    }
 
-		return tripDao.findAllByDate(range, offset, count, field);
-	}
+    public boolean updateStatus(Trip trip, String status) {
+        return tripDao.updateStatus(trip, status);
+    }
 
-	public List<Trip> findAllByPersonId(Long personId, int offset, int count, String sorting) {
-		String field = getFieldName(sorting);
+    public BigDecimal getDiscount(Long personId, BigDecimal bill) {
+        BigDecimal result = null;
+        BigDecimal totalBill = tripDao.getTotalBill(personId);
 
-		return tripDao.findAllByPersonId(personId, offset, count, field);
-	}
+        if (totalBill == null) {
+            totalBill = new BigDecimal(0);
+        }
 
-	public List<Trip> findAllByPersonIdAndDate(Long personId, String dateRange, int offset, int count, String sorting) {
+        if (totalBill.compareTo(new BigDecimal(1000)) >= 0) {
+            result = bill.multiply(new BigDecimal(0.10));
 
-		String field = getFieldName(sorting);
-		Timestamp[] range = getDateRange(dateRange);
+        } else if (totalBill.compareTo(new BigDecimal(500)) >= 0) {
+            result = bill.multiply(new BigDecimal(0.05));
 
-		return tripDao.findAllByPersonIdAndDate(personId, range, offset, count, field);
-	}
+        } else if (totalBill.compareTo(new BigDecimal(100)) >= 0) {
+            result = bill.multiply(new BigDecimal(0.02));
+        } else {
+            result = new BigDecimal(0);
+        }
 
-	public boolean updateStatus(Trip trip, String status) {
-		return tripDao.updateStatus(trip, status);
-	}
+        return result;
 
-	public BigDecimal getDiscount(Long personId, BigDecimal bill) {
-		BigDecimal result = null;
-		BigDecimal totalBill = tripDao.getTotalBill(personId);
-		
-		if(totalBill == null) {
-			totalBill = new BigDecimal(0);
-		}
+    }
 
-		if (totalBill.compareTo(new BigDecimal(1000)) >= 0) {
-			result = bill.multiply(new BigDecimal(0.10));
+    public int getPages(int count) {
+        double result = tripDao.getCount();
+        result = Math.ceil(result / count);
+        return (int) result;
+    }
 
-		} else if (totalBill.compareTo(new BigDecimal(500)) >= 0) {
-			result = bill.multiply(new BigDecimal(0.05));
+    public int getPages(String dateRange, int count) {
+        Timestamp[] range = getDateRange(dateRange);
+        double result = tripDao.getCountByDate(range);
+        result = Math.ceil(result / count);
+        return (int) result;
+    }
 
-		} else if (totalBill.compareTo(new BigDecimal(100)) >= 0) {
-			result = bill.multiply(new BigDecimal(0.02));
-		} else {
-			result = new BigDecimal(0);
-		}
+    public int getPages(Long personId, int count) {
+        double result = tripDao.getCountByPersonId(personId);
+        result = Math.ceil(result / count);
+        return (int) result;
+    }
 
-		return result;
+    public int getPages(Long personId, String dateRange, int count) {
+        Timestamp[] range = getDateRange(dateRange);
+        double result = tripDao.getCountByPersonIdAndDate(personId, range);
+        result = Math.ceil(result / count);
+        return (int) result;
+    }
 
-	}
+    private Timestamp[] getDateRange(String dateRange) {
+        Timestamp[] result = new Timestamp[2];
+        Date start = null;
+        Date end = null;
+        String[] range = dateRange.split(" - ");
 
-	public int getPages(int count) {
-		double result = tripDao.getCount();
-		result = Math.ceil(result / count);
+        try {
+            start = new SimpleDateFormat("dd.MM.yyyy").parse(range[0]);
+            end = new SimpleDateFormat("dd.MM.yyyy").parse(range[1]);
+        } catch (ParseException e) {
+            LOG.debug(e.getMessage());
+        }
+        result[0] = new Timestamp(start.getTime());
+        result[1] = new Timestamp(end.getTime());
+        return result;
+    }
 
-		return (int) result;
-	}
+    private String getFieldName(String sorting) {
+        String field = null;
 
-	public int getPages(String dateRange, int count) {
-		Timestamp[] range = getDateRange(dateRange);
-		double result = tripDao.getCountByDate(range);
-		result = Math.ceil(result / count);
-
-		return (int) result;
-	}
-
-	public int getPages(Long personId, int count) {
-		double result = tripDao.getCountByPersonId(personId);
-		result = Math.ceil(result / count);
-
-		return (int) result;
-	}
-
-	public int getPages(Long personId, String dateRange, int count) {
-		Timestamp[] range = getDateRange(dateRange);
-		double result = tripDao.getCountByPersonIdAndDate(personId, range);
-		result = Math.ceil(result / count);
-
-		return (int) result;
-	}
-
-	private Timestamp[] getDateRange(String dateRange) {
-		Timestamp[] result = new Timestamp[2];
-		Date start = null;
-		Date end = null;
-		String[] range = dateRange.split(" - ");
-		try {
-			start = new SimpleDateFormat("dd.MM.yyyy").parse(range[0]);
-			end = new SimpleDateFormat("dd.MM.yyyy").parse(range[1]);
-		} catch (ParseException e) {
-			LOG.debug(e.getMessage());
-		}
-
-		result[0] = new Timestamp(start.getTime());
-		result[1] = new Timestamp(end.getTime());
-
-		return result;
-	}
-
-	private String getFieldName(String sorting) {
-		String field = null;
-
-		switch (sorting) {
-		case "date_asc":
-			field = Fields.TRIP__DATE;
-			break;
-		case "date_desc":
-			field = Fields.TRIP__DATE + SORT_DESC;
-			break;
-		case "bill_asc":
-			field = Fields.TRIP__BILL;
-			break;
-		case "bill_desc":
-			field = Fields.TRIP__BILL + SORT_DESC;
-			break;
-		default:
-			field = Fields.TRIP__DATE + SORT_DESC;
-			break;
-		}
-
-		return field;
-	}
-
+        switch (sorting) {
+        case "date_asc":
+            field = Fields.TRIP__DATE;
+            break;
+        case "date_desc":
+            field = Fields.TRIP__DATE + SORT_DESC;
+            break;
+        case "bill_asc":
+            field = Fields.TRIP__BILL;
+            break;
+        case "bill_desc":
+            field = Fields.TRIP__BILL + SORT_DESC;
+            break;
+        default:
+            field = Fields.TRIP__DATE + SORT_DESC;
+            break;
+        }
+        return field;
+    }
 }

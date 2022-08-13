@@ -13,29 +13,25 @@ import com.example.taxiservice.factory.annotation.InjectByType;
  * annotated fields by specified field type.
  */
 public class InjectByTypeAnnotationObjectConfigurator implements ObjectConfigurator {
+    private static final Logger LOG = LoggerFactory.getLogger(InjectByTypeAnnotationObjectConfigurator.class);
 
-	private static final Logger LOG = LoggerFactory.getLogger(InjectByTypeAnnotationObjectConfigurator.class);
+    @Override
+    public void configure(Object t, AppContext context) {
+        LOG.debug("Configuring starts");
+        
+        for (Field field : t.getClass().getDeclaredFields()) {
 
-	@Override
-	public void configure(Object t, AppContext context) {
-
-		LOG.debug("Configuring starts");
-
-		for (Field field : t.getClass().getDeclaredFields()) {
-
-			if (field.isAnnotationPresent(InjectByType.class)) {
-				Object object = context.getObject(field.getType());
-				field.setAccessible(true);
-				try {
-					field.set(t, object);
-				} catch (IllegalArgumentException | IllegalAccessException e) {
-					LOG.error(e.getMessage());
-				}
-			}
-
-		}
-
-		LOG.debug("Configuring finished");
-	}
-
+            if (field.isAnnotationPresent(InjectByType.class)) {
+                Object object = context.getObject(field.getType());
+                field.setAccessible(true);
+                
+                try {
+                    field.set(t, object);
+                } catch (IllegalArgumentException | IllegalAccessException e) {
+                    LOG.error(e.getMessage());
+                }
+            }
+        }
+        LOG.debug("Configuring finished");
+    }
 }

@@ -20,160 +20,145 @@ import com.example.taxiservice.model.Person;
  */
 @Singleton
 public class PersonDaoMySql extends AbstractDao<Person> implements PersonDao {
+    private static final String SQL__FIND_PERSON_BY_ID = "SELECT * FROM person WHERE p_id=?";
+    private static final String SQL__FIND_PERSON_BY_PHONE = "SELECT * FROM person WHERE p_phone=?";
+    private static final String SQL__INSERT_PERSON = "INSERT INTO person (p_phone, p_password, p_name, p_surname) VALUES (?,?,?,?)";
+    private static final String SQL__UPDATE_PERSON = "UPDATE person SET p_phone=?, p_password=?, p_name=?, p_surname=? WHERE p_id = ?";
+    private static final Logger LOG = LoggerFactory.getLogger(PersonDaoMySql.class);
 
-	private static final String SQL__FIND_PERSON_BY_ID = "SELECT * FROM person WHERE p_id=?";
-	private static final String SQL__FIND_PERSON_BY_PHONE = "SELECT * FROM person WHERE p_phone=?";
-	private static final String SQL__INSERT_PERSON = "INSERT INTO person (p_phone, p_password, p_name, p_surname) VALUES (?,?,?,?)";
-	private static final String SQL__UPDATE_PERSON = "UPDATE person SET p_phone=?, p_password=?, p_name=?, p_surname=? WHERE p_id = ?";
+    public PersonDaoMySql() {
+        LOG.info("MySqlPersonDao initialized");
+    }
 
-	private static final Logger LOG = LoggerFactory.getLogger(PersonDaoMySql.class);
+    @Override
+    public Person find(Long id) {
+        Person person = null;
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet set = null;
 
-	public PersonDaoMySql() {
-		LOG.info("MySqlPersonDao initialized");
-	}
+        try {
+            connection = getConnection();
+            statement = connection.prepareStatement(SQL__FIND_PERSON_BY_ID);
+            statement.setLong(1, id);
+            set = statement.executeQuery();
 
-	@Override
-	public Person find(Long id) {
-		Person person = null;
+            while (set.next()) {
+                person = mapRow(set);
+            }
 
-		Connection connection = null;
-		PreparedStatement statement = null;
-		ResultSet set = null;
+            commit(connection);
+        } catch (SQLException e) {
+            rollback(connection);
+            LOG.error(e.getMessage());
+        } finally {
+            close(set, statement, connection);
+        }
+        return person;
+    }
 
-		try {
-			connection = getConnection();
-			statement = connection.prepareStatement(SQL__FIND_PERSON_BY_ID);
-			statement.setLong(1, id);
-			set = statement.executeQuery();
+    @Override
+    public Person find(String phone) {
+        Person person = null;
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet set = null;
 
-			while (set.next()) {
-				person = mapRow(set);
-			}
+        try {
+            connection = getConnection();
+            statement = connection.prepareStatement(SQL__FIND_PERSON_BY_PHONE);
+            statement.setString(1, phone);
+            set = statement.executeQuery();
 
-			commit(connection);
+            while (set.next()) {
+                person = mapRow(set);
+            }
 
-		} catch (SQLException e) {
-			rollback(connection);
-			LOG.error(e.getMessage());
-		} finally {
+            commit(connection);
+        } catch (SQLException e) {
+            rollback(connection);
+            LOG.error(e.getMessage());
+        } finally {
+            close(set, statement, connection);
+        }
+        return person;
+    }
 
-			close(set, statement, connection);
-		}
+    @Override
+    public boolean insert(Person person) {
+        boolean result = false;
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet set = null;
 
-		return person;
-	}
+        try {
+            connection = getConnection();
+            statement = connection.prepareStatement(SQL__INSERT_PERSON, Statement.RETURN_GENERATED_KEYS);
+            statement.setString(1, person.getPhone());
+            statement.setString(2, person.getPassword());
+            statement.setString(3, person.getName());
+            statement.setString(4, person.getSurname());
+            statement.executeUpdate();
+            set = statement.getGeneratedKeys();
 
-	@Override
-	public Person find(String phone) {
-		Person person = null;
+            while (set.next()) {
+                person.setId(set.getLong(1));
+            }
 
-		Connection connection = null;
-		PreparedStatement statement = null;
-		ResultSet set = null;
+            commit(connection);
+            result = true;
+        } catch (SQLException e) {
+            rollback(connection);
+            LOG.error(e.getMessage());
+        } finally {
+            close(set, statement, connection);
+        }
+        return result;
+    }
 
-		try {
-			connection = getConnection();
-			statement = connection.prepareStatement(SQL__FIND_PERSON_BY_PHONE);
-			statement.setString(1, phone);
-			set = statement.executeQuery();
+    @Override
+    public boolean update(Person person) {
+        boolean result = false;
+        Connection connection = null;
+        PreparedStatement statement = null;
 
-			while (set.next()) {
-				person = mapRow(set);
-			}
+        try {
+            connection = getConnection();
+            statement = connection.prepareStatement(SQL__UPDATE_PERSON);
+            statement.setString(1, person.getPhone());
+            statement.setString(2, person.getPassword());
+            statement.setString(3, person.getName());
+            statement.setString(4, person.getSurname());
+            statement.setLong(5, person.getId());
+            statement.executeUpdate();
+            commit(connection);
+            result = true;
 
-			commit(connection);
+        } catch (SQLException e) {
+            rollback(connection);
+            LOG.error(e.getMessage());
+        } finally {
+            close(statement, connection);
+        }
+        return result;
+    }
 
-		} catch (SQLException e) {
-			rollback(connection);
-			LOG.error(e.getMessage());
-		} finally {
-			close(set, statement, connection);
-		}
+    @Override
+    protected Person mapRow(ResultSet set) {
+        Person person = null;
 
-		return person;
-	}
+        try {
+            person = new Person();
+            person.setId(set.getLong(Fields.PERSON__ID));
+            person.setPhone(set.getString(Fields.PERSON__PHONE));
+            person.setPassword(set.getString(Fields.PERSON__PASSWORD));
+            person.setName(set.getString(Fields.PERSON__NAME));
+            person.setSurname(set.getString(Fields.PERSON__SURNAME));
+            person.setRoleId(set.getInt(Fields.PERSON__ROLE_ID));
 
-	@Override
-	public boolean insert(Person person) {
-		boolean result = false;
-		Connection connection = null;
-		PreparedStatement statement = null;
-		ResultSet set = null;
-
-		try {
-			connection = getConnection();
-			statement = connection.prepareStatement(SQL__INSERT_PERSON, Statement.RETURN_GENERATED_KEYS);
-			statement.setString(1, person.getPhone());
-			statement.setString(2, person.getPassword());
-			statement.setString(3, person.getName());
-			statement.setString(4, person.getSurname());
-			statement.executeUpdate();
-			set = statement.getGeneratedKeys();
-
-			while (set.next()) {
-				person.setId(set.getLong(1));
-			}
-
-			commit(connection);
-			result = true;
-		} catch (SQLException e) {
-			rollback(connection);
-			LOG.error(e.getMessage());
-		} finally {
-			close(set, statement, connection);
-		}
-
-		return result;
-
-	}
-
-	@Override
-	public boolean update(Person person) {
-		boolean result = false;
-		Connection connection = null;
-		PreparedStatement statement = null;
-
-		try {
-			connection = getConnection();
-			statement = connection.prepareStatement(SQL__UPDATE_PERSON);
-			statement.setString(1, person.getPhone());
-			statement.setString(2, person.getPassword());
-			statement.setString(3, person.getName());
-			statement.setString(4, person.getSurname());
-			statement.setLong(5, person.getId());
-			statement.executeUpdate();
-
-			commit(connection);
-			result = true;
-
-		} catch (SQLException e) {
-			rollback(connection);
-			LOG.error(e.getMessage());
-		} finally {
-			close(statement, connection);
-		}
-
-		return result;
-
-	}
-
-	@Override
-	protected Person mapRow(ResultSet set) {
-		Person person = null;
-
-		try {
-			person = new Person();
-			person.setId(set.getLong(Fields.PERSON__ID));
-			person.setPhone(set.getString(Fields.PERSON__PHONE));
-			person.setPassword(set.getString(Fields.PERSON__PASSWORD));
-			person.setName(set.getString(Fields.PERSON__NAME));
-			person.setSurname(set.getString(Fields.PERSON__SURNAME));
-			person.setRoleId(set.getInt(Fields.PERSON__ROLE_ID));
-
-		} catch (SQLException e) {
-			LOG.error(e.getMessage());
-		}
-
-		return person;
-	}
+        } catch (SQLException e) {
+            LOG.error(e.getMessage());
+        }
+        return person;
+    }
 }

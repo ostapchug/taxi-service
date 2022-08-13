@@ -15,34 +15,32 @@ import com.example.taxiservice.model.Car;
  */
 @Singleton
 public class CarService {
+    private static final Logger LOG = LoggerFactory.getLogger(CarService.class);
 
-	private static final Logger LOG = LoggerFactory.getLogger(CarService.class);
+    @InjectByType
+    private CarDao carDao;
 
-	@InjectByType
-	private CarDao carDao;
+    public CarService() {
+        LOG.info("CarService initialized");
+    }
 
-	public CarService() {
-		LOG.info("CarService initialized");
-	}
+    public Car find(Long id) {
+        return carDao.find(id);
+    }
 
-	public Car find(Long id) {
-		return carDao.find(id);
-	}
+    public Car find(Long categoryId, Integer capacity) {
+        return carDao.find(categoryId, capacity);
+    }
 
-	public Car find(Long categoryId, Integer capacity) {
-		return carDao.find(categoryId, capacity);
-	}
+    public Car findByCapacity(Integer capacity) {
+        return carDao.findByCapacity(capacity);
+    }
 
-	public Car findByCapacity(Integer capacity) {
-		return carDao.findByCapacity(capacity);
-	}
+    public List<Car> findCars(Long categoryId, Integer capacity) {
+        return carDao.findCars(categoryId, capacity);
+    }
 
-	public List<Car> findCars(Long categoryId, Integer capacity) {
-		return carDao.findCars(categoryId, capacity);
-	}
-
-	public List<Car> findCarsByTripId(Long tripId) {
-		return carDao.findCarsByTripId(tripId);
-	}
-
+    public List<Car> findCarsByTripId(Long tripId) {
+        return carDao.findCarsByTripId(tripId);
+    }
 }
